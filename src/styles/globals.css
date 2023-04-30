@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+}
+
+@layer base {
+  html,
+  body {
+    @apply bg-dark-teal;
+    @apply bg-slate-50;
+  }
+}
