@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { prisma } from "~/server/db";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { GAME_ID_SCHEMA } from "./gameRouter";
+import { createTRPCRouter, protectedProcedure } from "../../trpc";
+import { GAME_ID_SCHEMA } from "../gameRouter/gameRouter";
 
 const isValidRank = async (name: string) => {
   const rank = await prisma.gameRank.findUnique({ where: { name } });

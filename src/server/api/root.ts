@@ -1,6 +1,6 @@
 import { createTRPCRouter } from "~/server/api/trpc";
-import gameRouter from "./routers/gameRouter";
-import videoClipRouter from "./routers/videoClipRouter";
+import gameRouter from "./routers/gameRouter/gameRouter";
+import videoClipRouter from "./routers/videoClipRouter/videoClipRouter";
 
 /**
  * This is the primary router for your server.
