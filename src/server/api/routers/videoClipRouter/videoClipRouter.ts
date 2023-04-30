@@ -9,6 +9,16 @@ const isValidRank = async (name: string) => {
   return rank !== null && rank !== undefined;
 };
 
+export const FakeRankDoesntExistError = new TRPCError({
+  code: "NOT_FOUND",
+  message: "Provided fake rank doesn't exist.",
+});
+
+export const RealRankDoesntExistError = new TRPCError({
+  code: "NOT_FOUND",
+  message: "Provided real rank doesn't exist.",
+});
+
 const videoClipRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
@@ -26,17 +36,11 @@ const videoClipRouter = createTRPCRouter({
         input: { realRank, fakeRank, ytUrl, title, gameId },
       }) => {
         if (!(await isValidRank(realRank))) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Provided real rank doesn't exist",
-          });
+          throw RealRankDoesntExistError;
         }
 
         if (!(await isValidRank(fakeRank))) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Provided fake rank doesn't exist",
-          });
+          throw FakeRankDoesntExistError;
         }
 
         const newClip = await prisma.videoClip.create({
@@ -92,17 +96,11 @@ const videoClipRouter = createTRPCRouter({
         }
 
         if (newFakeRank && !(await isValidRank(newFakeRank))) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Provided fake rank doesn't exist.",
-          });
+          throw FakeRankDoesntExistError;
         }
 
         if (newRealRank && !(await isValidRank(newRealRank))) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Provided real rank doesn't exist.",
-          });
+          throw RealRankDoesntExistError;
         }
 
         return await prisma.videoClip.update({
