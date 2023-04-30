@@ -43,13 +43,14 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String      @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?     @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
+    VideoClip     VideoClip[]
 }
 
 model VerificationToken {
@@ -60,7 +61,44 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
+model GameRank {
+    name   String @id @db.Char(255)
+    Game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    minElo Int
+    maxElo Int
+    gameId Int
+
+    realRankClips VideoClip[] @relation("RealRankClips")
+    fakeRankClips VideoClip[] @relation("FakeRankClips")
+
+    @@index([gameId])
+}
+
 model Game {
-    id    Int    @id @default(autoincrement())
-    title String @unique @db.Char(255)
+    id    Int        @id @default(autoincrement())
+    title String     @unique @db.Char(255)
+    ranks GameRank[]
+}
+
+model VideoClip {
+    id    String @id @default(cuid())
+    title String @db.Text
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    realRank     GameRank @relation("RealRankClips", fields: [realRankName], references: [name], onDelete: Cascade, onUpdate: Cascade)
+    realRankName String   @db.Char(255)
+
+    fakeRank     GameRank @relation("FakeRankClips", fields: [fakeRankName], references: [name], onDelete: Cascade, onUpdate: Cascade)
+    fakeRankName String   @db.Char(255)
+
+    ytUrl String @db.Text
+
+    submittedAt DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@index([userId])
+    @@index([realRankName])
+    @@index([fakeRankName])
 }
