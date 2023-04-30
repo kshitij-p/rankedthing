@@ -2,6 +2,117 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
+import { useState } from "react";
+import { type Game } from "@prisma/client";
+
+const CreateClipForm = ({ id }: { id: Game["id"] }) => {
+  const [title, setTitle] = useState("");
+  const [fakeRank, setFakeRank] = useState("");
+  const [realRank, setRealRank] = useState("");
+  const [ytUrl, setYtUrl] = useState("");
+
+  const [clipToEdit, setClipToEdit] = useState("");
+
+  const { mutate: createClip } = api.videoClip.create.useMutation();
+  const { mutate: updateClip } = api.videoClip.update.useMutation();
+  const { mutate: deleteClip } = api.videoClip.delete.useMutation();
+  const { data: ranks } = api.game.getRanks.useQuery(
+    { id },
+    {
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    }
+  );
+  const { data: clips } = api.game.getAllClips.useQuery(
+    { id },
+    {
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    }
+  );
+
+  return (
+    <>
+      <form
+        className="mt-16"
+        onSubmit={(e) => {
+          e.preventDefault();
+          createClip({ fakeRank, title, realRank, ytUrl, gameId: id });
+        }}
+      >
+        <h1>Create clip</h1>
+        Title{" "}
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.currentTarget.value)}
+        />
+        FakeRank{" "}
+        <input
+          value={fakeRank}
+          onChange={(e) => setFakeRank(e.currentTarget.value)}
+        />
+        RealRank{" "}
+        <input
+          value={realRank}
+          onChange={(e) => setRealRank(e.currentTarget.value)}
+        />
+        Yturl{" "}
+        <input
+          value={ytUrl}
+          onChange={(e) => setYtUrl(e.currentTarget.value)}
+        />
+        <ul className="mt-4 max-h-16 overflow-y-auto">
+          {ranks?.map((rank) => (
+            <li key={rank.name}>
+              <p>{rank.name}</p>
+            </li>
+          ))}
+        </ul>
+        <button type="submit">Create</button>
+      </form>
+
+      <div className="mt-16">
+        All clips
+        <ul>
+          {clips?.map((clip) => (
+            <li key={clip.id} className="flex flex-col">
+              <p>Title {clip.title}</p>
+              <p>Real rank {clip.realRankName}</p>
+              <p>Fake rank {clip.fakeRankName}</p>
+              <p>ytUrl {clip.ytUrl}</p>
+              <p>id {clip.id}</p>
+              <button onClick={() => deleteClip({ id: clip.id })}>
+                delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <form
+        className="mt-16"
+        onSubmit={(e) => {
+          e.preventDefault();
+          updateClip({
+            id: clipToEdit,
+            newFakeRank: fakeRank,
+            newRealRank: realRank,
+            newTitle: title,
+            newYtUrl: ytUrl,
+          });
+        }}
+      >
+        <h1>Edit clip</h1>
+        Clip to edit{" "}
+        <input
+          value={clipToEdit}
+          onChange={(e) => setClipToEdit(e.currentTarget.value)}
+        />
+        <button>Edit</button>
+      </form>
+    </>
+  );
+};
 
 const Home: NextPage = () => {
   const { status } = useSession();
@@ -25,6 +136,7 @@ const Home: NextPage = () => {
             {games?.map((game) => (
               <li key={game.id}>
                 <p>{game.title}</p>
+                <CreateClipForm id={game.id} />
               </li>
             ))}
           </ul>

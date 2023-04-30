@@ -40,6 +40,8 @@ void (async function () {
   // region -- Delete all existing games and reset the auto incrementer
   await prisma.game.deleteMany();
 
+  await prisma.gameRank.deleteMany();
+
   //Reset the auto increment counter
   await prisma.$queryRaw(Prisma.sql`ALTER TABLE Game AUTO_INCREMENT = 1`);
 

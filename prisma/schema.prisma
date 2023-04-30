@@ -75,9 +75,10 @@ model GameRank {
 }
 
 model Game {
-    id    Int        @id @default(autoincrement())
-    title String     @unique @db.Char(255)
-    ranks GameRank[]
+    id        Int         @id @default(autoincrement())
+    title     String      @unique @db.Char(255)
+    ranks     GameRank[]
+    VideoClip VideoClip[]
 }
 
 model VideoClip {
@@ -86,6 +87,9 @@ model VideoClip {
 
     user   User   @relation(fields: [userId], references: [id])
     userId String
+
+    game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    gameId Int
 
     realRank     GameRank @relation("RealRankClips", fields: [realRankName], references: [name], onDelete: Cascade, onUpdate: Cascade)
     realRankName String   @db.Char(255)
@@ -99,6 +103,7 @@ model VideoClip {
     updatedAt   DateTime @updatedAt
 
     @@index([userId])
+    @@index([gameId])
     @@index([realRankName])
     @@index([fakeRankName])
 }
