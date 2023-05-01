@@ -76,10 +76,11 @@ model GameRank {
 }
 
 model Game {
-    id        Int         @id @default(autoincrement())
-    title     String      @unique @db.Char(255)
-    ranks     GameRank[]
-    VideoClip VideoClip[]
+    id         Int         @id @default(autoincrement())
+    title      String      @unique @db.Char(255)
+    shortTitle String      @unique @db.Char(255)
+    ranks      GameRank[]
+    VideoClip  VideoClip[]
 }
 
 model ClipVote {

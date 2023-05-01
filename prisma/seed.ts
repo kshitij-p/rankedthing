@@ -3,6 +3,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 const SUPPORTED_GAMES: Array<Prisma.GameCreateInput> = [
   {
     title: "Counter-Strike: Global Offensive",
+    shortTitle: "csgo",
     ranks: {
       createMany: {
         data: [

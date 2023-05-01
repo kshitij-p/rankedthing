@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -8,10 +9,23 @@ import {
 export const GAME_ID_SCHEMA = z.number().nonnegative();
 
 const gameRouter = createTRPCRouter({
+  getByShortTitle: publicProcedure
+    .input(z.object({ shortTitle: z.string() }))
+    .query(async ({ ctx: { prisma }, input: { shortTitle } }) => {
+      const game = await prisma.game.findUnique({ where: { shortTitle } });
+
+      if (!game) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Provided game id doesn't exist.",
+        });
+      }
+
+      return game;
+    }),
   getAll: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.game.findMany();
   }),
-
   getAllClips: publicProcedure
     .input(z.object({ gameId: GAME_ID_SCHEMA }))
     .query(async ({ ctx: { prisma }, input: { gameId } }) => {
