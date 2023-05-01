@@ -9,10 +9,11 @@ import { appRouter } from "~/server/api/root";
 import { api, type RouterOutputs } from "~/utils/api";
 import { useSession } from "next-auth/react";
 import AuthButton from "~/components/util/AuthButton";
-import { TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
+import { getFromParam, TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
 import Link from "next/link";
 import { z } from "zod";
 import { type Game } from "@prisma/client";
+import PageWithFallback from "~/components/util/PageWithFallback";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const caller = createServerSideHelpers({
@@ -32,7 +33,11 @@ export const getStaticProps: GetStaticProps<{
   game: RouterOutputs["game"]["getByShortTitle"];
 }> = async (ctx) => {
   //To do add error page for handling this error
-  const shortTitle = z.string().parse((ctx.params?.shortTitle as string) ?? "");
+  const shortTitle = getFromParam({
+    key: "shortTitle",
+    ctx,
+    schema: z.string(),
+  });
 
   const caller = createServerSideHelpers({
     ctx: createInnerTRPCContext({ session: null }),
@@ -67,7 +72,7 @@ const ProtectedArea = ({ game }: { game: Game }) => {
         {!isFetching && !isLoading ? (
           <p>
             {unvotedClip ? (
-              <Link href={""}>Get a random clip</Link>
+              <Link href={`/clips/${unvotedClip.id}`}>Get a random clip</Link>
             ) : (
               "No more clips available for this game ;-;"
             )}
@@ -97,4 +102,4 @@ const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
   );
 };
 
-export default GamePage;
+export default PageWithFallback(GamePage);

@@ -8,7 +8,7 @@ import useForm from "~/hooks/useForm";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { api, type RouterOutputs } from "~/utils/api";
-import { TIME_IN_MS } from "~/utils/client";
+import { TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
 
 export const getStaticProps: GetStaticProps<{
   games: RouterOutputs["game"]["getAll"];
@@ -24,6 +24,7 @@ export const getStaticProps: GetStaticProps<{
     props: {
       games,
     },
+    revalidate: TIME_IN_SECS.ONE_HOUR,
   };
 };
 

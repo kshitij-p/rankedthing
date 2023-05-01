@@ -1,3 +1,8 @@
+import {
+  type GetServerSidePropsContext,
+  type GetStaticPropsContext,
+} from "next";
+
 export const TIME_IN_MS = {
   ONE_MINUTE: 100 * 60,
   FIVE_MINUTES: 1000 * 60 * 5,
@@ -5,4 +10,16 @@ export const TIME_IN_MS = {
 
 export const TIME_IN_SECS = {
   ONE_HOUR: 3600,
+};
+
+export const getFromParam = <TValue>({
+  key,
+  schema,
+  ctx,
+}: {
+  key: string;
+  schema: Zod.Schema<TValue>;
+  ctx: GetServerSidePropsContext | GetStaticPropsContext;
+}) => {
+  return schema.parse(ctx.params?.[key]);
 };

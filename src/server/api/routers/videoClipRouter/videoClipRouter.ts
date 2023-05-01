@@ -1,7 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { prisma } from "~/server/db";
-import { createTRPCRouter, protectedProcedure } from "../../trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "../../trpc";
 import { GAME_ID_SCHEMA } from "../gameRouter/gameRouter";
 
 const isValidRank = async (name: string) => {
@@ -20,6 +24,24 @@ export const RealRankDoesntExistError = new TRPCError({
 });
 
 const videoClipRouter = createTRPCRouter({
+  getById: publicProcedure
+    .input(z.object({ clipId: z.string() }))
+    .query(async ({ ctx: { prisma }, input: { clipId } }) => {
+      const clip = await prisma.videoClip.findUnique({
+        where: {
+          id: clipId,
+        },
+      });
+
+      if (!clip) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Couldn't find a clip with the requested id ${clipId}.`,
+        });
+      }
+
+      return clip;
+    }),
   create: protectedProcedure
     .input(
       z.object({

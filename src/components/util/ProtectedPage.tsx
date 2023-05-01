@@ -11,6 +11,7 @@ const ProtectedPage = (Page: NextPage<any>) => {
     const router = useRouter();
 
     if (status === "loading" || !router.isReady) {
+      //To do add a spinner here
       return "Loading";
     }
 
