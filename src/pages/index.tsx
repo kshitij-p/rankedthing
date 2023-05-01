@@ -19,21 +19,21 @@ const CreateClipForm = ({ id }: { id: Game["id"] }) => {
   const { mutate: updateClip } = api.videoClip.update.useMutation();
   const { mutate: deleteClip } = api.videoClip.delete.useMutation();
   const { data: ranks } = api.game.getRanks.useQuery(
-    { id },
+    { gameId: id },
     {
       refetchOnWindowFocus: false,
       staleTime: Infinity,
     }
   );
   const { data: clips } = api.game.getAllClips.useQuery(
-    { id },
+    { gameId: id },
     {
       refetchOnWindowFocus: false,
       staleTime: Infinity,
     }
   );
-  const { data: unvotedClips } = api.user.getAllUnvotedClips.useQuery(
-    { id },
+  const { data: unvotedClips } = api.game.getAllUnvotedClips.useQuery(
+    { gameId: id },
     {
       refetchOnWindowFocus: false,
       staleTime: Infinity,

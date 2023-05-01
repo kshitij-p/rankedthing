@@ -1,10 +1,5 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "../../trpc";
-import { GAME_ID_SCHEMA } from "../gameRouter/gameRouter";
+import { createTRPCRouter, publicProcedure } from "../../trpc";
 
 const userRouter = createTRPCRouter({
   getTotalScore: publicProcedure
@@ -23,22 +18,6 @@ const userRouter = createTRPCRouter({
         )._sum.score ?? 0;
 
       return totalScore;
-    }),
-  getAllUnvotedClips: protectedProcedure
-    .input(z.object({ id: GAME_ID_SCHEMA }))
-    .query(async ({ ctx: { prisma, session }, input: { id: gameId } }) => {
-      return await prisma.videoClip.findMany({
-        where: {
-          gameId,
-          AND: {
-            ClipVote: {
-              none: {
-                userId: session.user.id,
-              },
-            },
-          },
-        },
-      });
     }),
 });
 
