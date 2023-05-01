@@ -17,7 +17,6 @@ const gameRouter = createTRPCRouter({
         },
       });
     }),
-
   getRanks: publicProcedure
     .input(z.object({ id: GAME_ID_SCHEMA }))
     .query(async ({ ctx: { prisma }, input: { id: gameId } }) => {

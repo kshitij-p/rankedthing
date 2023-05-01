@@ -51,6 +51,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     VideoClip     VideoClip[]
+    ClipVote      ClipVote[]
 }
 
 model VerificationToken {
@@ -81,6 +82,24 @@ model Game {
     VideoClip VideoClip[]
 }
 
+model ClipVote {
+    id String @id @default(cuid())
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    userId String
+
+    clip        VideoClip @relation(fields: [videoClipId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    videoClipId String
+
+    guessedHigher Boolean
+
+    score       Int
+    submittedAt DateTime @default(now())
+
+    @@unique([videoClipId, userId])
+    @@index([userId])
+}
+
 model VideoClip {
     id    String @id @default(cuid())
     title String @db.Text
@@ -99,8 +118,9 @@ model VideoClip {
 
     ytUrl String @db.Text
 
-    submittedAt DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    submittedAt DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
+    ClipVote    ClipVote[]
 
     @@index([userId])
     @@index([gameId])

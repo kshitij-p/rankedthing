@@ -6,6 +6,8 @@ import { useState } from "react";
 import { type Game } from "@prisma/client";
 
 const CreateClipForm = ({ id }: { id: Game["id"] }) => {
+  const { status } = useSession();
+
   const [title, setTitle] = useState("");
   const [fakeRank, setFakeRank] = useState("");
   const [realRank, setRealRank] = useState("");
@@ -30,9 +32,22 @@ const CreateClipForm = ({ id }: { id: Game["id"] }) => {
       staleTime: Infinity,
     }
   );
+  const { data: unvotedClips } = api.user.getAllUnvotedClips.useQuery(
+    { id },
+    {
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+      enabled: status === "authenticated",
+    }
+  );
+
+  const { mutate: vote } = api.clipVote.vote.useMutation();
 
   return (
     <>
+      <p>{unvotedClips && `${unvotedClips.length}`}</p>
+      <p>{clips && `${clips.length}`}</p>
+
       <form
         className="mt-16"
         onSubmit={(e) => {
@@ -81,6 +96,16 @@ const CreateClipForm = ({ id }: { id: Game["id"] }) => {
               <p>Fake rank {clip.fakeRankName}</p>
               <p>ytUrl {clip.ytUrl}</p>
               <p>id {clip.id}</p>
+              <button
+                onClick={() => vote({ guessedHigher: true, id: clip.id })}
+              >
+                Higher
+              </button>
+              <button
+                onClick={() => vote({ guessedHigher: false, id: clip.id })}
+              >
+                Lower
+              </button>
               <button onClick={() => deleteClip({ id: clip.id })}>
                 delete
               </button>
@@ -115,12 +140,21 @@ const CreateClipForm = ({ id }: { id: Game["id"] }) => {
 };
 
 const Home: NextPage = () => {
-  const { status } = useSession();
+  const { status, data } = useSession();
 
   const { data: games } = api.game.getAll.useQuery(undefined, {
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
+
+  const { data: totalScore } = api.user.getTotalScore.useQuery(
+    { id: data?.user.id ?? "0" },
+    {
+      enabled: data != undefined,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    }
+  );
 
   return (
     <>
@@ -130,6 +164,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-dark-teal">
+        {totalScore !== undefined && <p>Total score: {`${totalScore}`}</p>}
         <div>
           Games we support:
           <ul>

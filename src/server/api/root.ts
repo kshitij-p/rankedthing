@@ -1,5 +1,7 @@
 import { createTRPCRouter } from "~/server/api/trpc";
 import gameRouter from "./routers/gameRouter/gameRouter";
+import userRouter from "./routers/userRouter/userRouter";
+import clipVoteRouter from "./routers/videoClipRouter/clipVoteRouter";
 import videoClipRouter from "./routers/videoClipRouter/videoClipRouter";
 
 /**
@@ -10,6 +12,8 @@ import videoClipRouter from "./routers/videoClipRouter/videoClipRouter";
 export const appRouter = createTRPCRouter({
   game: gameRouter,
   videoClip: videoClipRouter,
+  user: userRouter,
+  clipVote: clipVoteRouter,
 });
 
 // export type definition of API
