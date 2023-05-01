@@ -9,7 +9,7 @@ import { appRouter } from "~/server/api/root";
 import { api, type RouterOutputs } from "~/utils/api";
 import { useSession } from "next-auth/react";
 import AuthButton from "~/components/util/AuthButton";
-import { TIME_IN_MS } from "~/utils/client";
+import { TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
 import Link from "next/link";
 import { z } from "zod";
 import { type Game } from "@prisma/client";
@@ -45,6 +45,7 @@ export const getStaticProps: GetStaticProps<{
     props: {
       game,
     },
+    revalidate: TIME_IN_SECS.ONE_HOUR,
   };
 };
 
