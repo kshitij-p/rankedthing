@@ -5,27 +5,37 @@ import { createTRPCRouter, protectedProcedure } from "../../trpc";
 
 const CORRECT_SCORE_REWARD = 10;
 
-const getScore = ({
+type RankRange = Pick<GameRank, "minElo" | "maxElo">;
+
+export const rankIsGTE = (rankOne: RankRange, rankTwo: RankRange) => {
+  return rankOne.minElo >= rankTwo.maxElo;
+};
+
+export const rankIsLTE = (rankOne: RankRange, rankTwo: RankRange) => {
+  return rankOne.maxElo <= rankTwo.minElo;
+};
+
+export const getScore = ({
   fakeRank,
   realRank,
   guessedHigher,
 }: {
-  fakeRank: Pick<GameRank, "minElo" | "maxElo">;
-  realRank: Pick<GameRank, "minElo" | "maxElo">;
+  fakeRank: RankRange;
+  realRank: RankRange;
   guessedHigher: boolean;
 }) => {
   let score = 0;
 
-  //Check if REALRANK is LOWER than FAKERANK and in this case reward players who vote lower
+  //Check if RealRank is LOWER than FakeRank and in this case reward players who vote lower
   //E.g. Real rank = Silver, Fake Rank = Gold, only reward ppl who voted lower
-  if (realRank.maxElo <= fakeRank.minElo) {
+  if (rankIsLTE(realRank, fakeRank)) {
     if (!guessedHigher) {
       score += CORRECT_SCORE_REWARD;
     }
 
-    //Check if REALRANK is HIGHER than FAKERANK and in this case reward players who vote higher
+    //Check if RealRank is HIGHER than FakeRank and in this case reward players who vote higher
     //E.g. Real rank = Gold, Fake Rank = Silver, only reward ppl who voted higher
-  } else if (realRank.minElo >= fakeRank.maxElo) {
+  } else if (rankIsGTE(realRank, fakeRank)) {
     if (guessedHigher) {
       score += CORRECT_SCORE_REWARD;
     }

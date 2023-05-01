@@ -1,7 +1,7 @@
 import { createTRPCRouter } from "~/server/api/trpc";
 import gameRouter from "./routers/gameRouter/gameRouter";
 import userRouter from "./routers/userRouter/userRouter";
-import clipVoteRouter from "./routers/videoClipRouter/clipVoteRouter";
+import clipVoteRouter from "./routers/clipVoteRouter/clipVoteRouter";
 import videoClipRouter from "./routers/videoClipRouter/videoClipRouter";
 
 /**
