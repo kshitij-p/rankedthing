@@ -78,6 +78,7 @@ const ProtectedArea = ({ game }: { game: Game }) => {
             )}
           </p>
         ) : (
+          //To do add a spinner here
           "Loading.."
         )}
       </div>
@@ -90,6 +91,7 @@ const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const { status, data } = useSession();
 
   if (status === "loading") {
+    //To do add a spinner here
     return <div>Loading...</div>;
   }
 

@@ -47,6 +47,24 @@ export const getScore = ({
 };
 
 const clipVoteRouter = createTRPCRouter({
+  canVoteOn: protectedProcedure
+    .input(z.object({ clipId: z.string() }))
+    .query(async ({ ctx: { prisma, session }, input: { clipId } }) => {
+      const clip = await prisma.videoClip.findFirst({
+        where: {
+          id: clipId,
+          AND: {
+            ClipVote: {
+              none: {
+                userId: session.user.id,
+              },
+            },
+          },
+        },
+      });
+
+      return clip !== null;
+    }),
   vote: protectedProcedure
     .input(z.object({ id: z.string(), guessedHigher: z.boolean() }))
     .mutation(
