@@ -47,23 +47,19 @@ export const getScore = ({
 };
 
 const clipVoteRouter = createTRPCRouter({
-  canVoteOn: protectedProcedure
+  getVoteForClip: protectedProcedure
     .input(z.object({ clipId: z.string() }))
     .query(async ({ ctx: { prisma, session }, input: { clipId } }) => {
-      const clip = await prisma.videoClip.findFirst({
+      const vote = await prisma.clipVote.findFirst({
         where: {
-          id: clipId,
+          videoClipId: clipId,
           AND: {
-            ClipVote: {
-              none: {
-                userId: session.user.id,
-              },
-            },
+            userId: session.user.id,
           },
         },
       });
 
-      return clip !== null;
+      return vote;
     }),
   vote: protectedProcedure
     .input(z.object({ id: z.string(), guessedHigher: z.boolean() }))
@@ -96,6 +92,13 @@ const clipVoteRouter = createTRPCRouter({
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Provided clip to vote on doesn't exist.",
+          });
+        }
+
+        if (toVoteOn.userId === session.user.id) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Cannot vote on your own clip.",
           });
         }
 
