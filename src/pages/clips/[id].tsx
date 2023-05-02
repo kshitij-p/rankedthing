@@ -127,7 +127,7 @@ const GameClipPage = ({
   return (
     <div className="p-6">
       <div className="flex flex-col gap-4 text-lg">
-        <h3 className="text-xl font-bold">{clip.game.title}</h3>
+        <h3 className="text-xl font-extrabold">{clip.game.title}</h3>
         <div className="flex aspect-video w-[38rem] max-w-[75vw] items-center justify-center self-center">
           {embedUrl ? (
             <iframe
@@ -138,14 +138,16 @@ const GameClipPage = ({
             <b>This link is broken sadge ;-;</b>
           )}
         </div>
-
-        {/* <p>{clip.fakeRankName}</p> */}
-        <div className="relative aspect-square w-16 self-center object-contain">
-          <Image
-            src={"/images/csgo/ranks/Gold Nova III.png"}
-            alt={"gold nova"}
-            fill
-          />
+        <div className="flex flex-col items-center self-center">
+          <div className="relative aspect-video w-28">
+            <Image
+              className="object-contain"
+              src={`/images/${clip.game.shortTitle}/ranks/${clip.fakeRankName}.png`}
+              alt={"gold nova"}
+              fill
+            />
+          </div>
+          <p className="text-base">{clip.fakeRankName}</p>
         </div>
         <b>{"Player's real rank is"} </b>
         <VotingArea clip={clip} />

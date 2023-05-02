@@ -8,7 +8,8 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "test": "vitest run"
+    "test": "vitest run",
+    "validateSeed": "ts-node prisma/validateSupportedGames.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.0",

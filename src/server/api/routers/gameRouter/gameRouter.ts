@@ -42,6 +42,9 @@ const gameRouter = createTRPCRouter({
         where: {
           gameId,
         },
+        orderBy: {
+          maxElo: "asc",
+        },
       });
     }),
   getAllUnvotedClips: protectedProcedure
