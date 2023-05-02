@@ -108,6 +108,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
   const { data: existingVote } = api.clipVote.getVoteForClip.useQuery(
     { clipId: clip.id },
     {
+      enabled: sessionData !== null,
       staleTime: TIME_IN_MS.ONE_MINUTE,
     }
   );
@@ -145,7 +146,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
           <div className="item-center absolute inset-0 z-10 flex h-full w-full justify-center bg-neutral-1000/60 backdrop-blur-[2px]">
             <div className="inline-flex items-center justify-center text-center text-lg font-bold text-slate-300 md:text-2xl">
               {status === "unauthenticated" ? (
-                <AuthButton />
+                <AuthButton variants={{ type: "primary" }} />
               ) : existingVote ? (
                 <div className="flex flex-col items-center font-normal">
                   <RankImage

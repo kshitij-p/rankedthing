@@ -1,16 +1,28 @@
 import { signIn, signOut, useSession } from "next-auth/react";
+import React, { type ForwardedRef } from "react";
+import Button from "../ui/Button";
 
-const AuthButton = () => {
-  const { data } = useSession();
+const AuthButton = React.forwardRef(
+  (
+    { variants, ...rest }: React.ComponentProps<typeof Button>,
+    passedRef: ForwardedRef<HTMLButtonElement>
+  ) => {
+    const { data } = useSession();
 
-  return (
-    <button
-      className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-      onClick={data ? () => void signOut() : () => void signIn()}
-    >
-      {data ? "Sign out" : "Sign in"}
-    </button>
-  );
-};
+    return (
+      <Button
+        {...rest}
+        type="button"
+        variants={{ type: "secondary", ...variants }}
+        onClick={data ? () => void signOut() : () => void signIn("google")}
+        ref={passedRef}
+      >
+        {data ? "Sign out" : "Sign in"}
+      </Button>
+    );
+  }
+);
+
+AuthButton.displayName = "AuthButton";
 
 export default AuthButton;
