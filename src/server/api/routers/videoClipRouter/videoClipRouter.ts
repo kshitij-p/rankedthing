@@ -31,6 +31,9 @@ const videoClipRouter = createTRPCRouter({
         where: {
           id: clipId,
         },
+        include: {
+          game: true,
+        },
       });
 
       if (!clip) {

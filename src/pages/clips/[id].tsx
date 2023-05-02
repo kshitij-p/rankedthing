@@ -5,12 +5,24 @@ import {
   type GetStaticPaths,
 } from "next";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import { useMemo } from "react";
 import { z } from "zod";
 import PageWithFallback from "~/components/util/PageWithFallback";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { api, type RouterInputs, type RouterOutputs } from "~/utils/api";
 import { getFromParam, TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
+
+const getEmbedUrl = (url: string) => {
+  const id = url.split("?v=")?.[1];
+
+  if (!id) {
+    return null;
+  }
+
+  return `https://www.youtube.com/embed/${id}`;
+};
 
 type PageClip = Omit<
   RouterOutputs["videoClip"]["getById"],
@@ -75,28 +87,28 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
 
   return (
     <div>
-      {canVote ? "canVote" : "cant vote"}
       <fieldset className="group" disabled={votingDisabled}>
-        <div className={"relative z-[1]"}>
+        <div className={"relative z-[1] flex justify-evenly"}>
           {votingDisabled && (
-            <div className="absolute inset-0 z-10 h-full w-full group-disabled:backdrop-blur-[2px]">
-              <p>
+            <div className="item-center absolute inset-0 z-10 flex h-full w-full justify-center backdrop-blur-[3px] ">
+              <b className="">
                 {!canVote
                   ? "You have already voted on this clip"
                   : status === "unauthenticated"
                   ? "You must be logged in to vote"
                   : //To do add a spinner here
                     "Loading..."}
-              </p>
+              </b>
             </div>
           )}
-
           <button
+            className="text-2xl"
             onClick={() => handleVoting({ id: clip.id, guessedHigher: true })}
           >
             Higher
           </button>
           <button
+            className="text-2xl"
             onClick={() => handleVoting({ id: clip.id, guessedHigher: false })}
           >
             Lower
@@ -110,10 +122,34 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
 const GameClipPage = ({
   clip,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const embedUrl = useMemo(() => getEmbedUrl(clip.ytUrl), [clip.ytUrl]);
+
   return (
-    <div>
-      {clip.title}
-      <VotingArea clip={clip} />
+    <div className="p-6">
+      <div className="flex flex-col gap-4 text-lg">
+        <h3 className="text-xl font-bold">{clip.game.title}</h3>
+        <div className="flex aspect-video w-[38rem] max-w-[75vw] items-center justify-center self-center">
+          {embedUrl ? (
+            <iframe
+              className="h-full w-full"
+              src={getEmbedUrl(clip.ytUrl) ?? ""}
+            />
+          ) : (
+            <b>This link is broken sadge ;-;</b>
+          )}
+        </div>
+
+        {/* <p>{clip.fakeRankName}</p> */}
+        <div className="relative aspect-square w-16 self-center object-contain">
+          <Image
+            src={"/images/csgo/ranks/Gold Nova III.png"}
+            alt={"gold nova"}
+            fill
+          />
+        </div>
+        <b>{"Player's real rank is"} </b>
+        <VotingArea clip={clip} />
+      </div>
     </div>
   );
 };

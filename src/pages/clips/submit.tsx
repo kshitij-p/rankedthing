@@ -63,6 +63,8 @@ const ClipSubmitPage = ({
     createClip({ gameId: parsedGameId, ...data });
   };
 
+  //To do add a state on success to go to the clip
+
   return (
     <div>
       <Form form={form} onSubmit={handleSubmit} disabled={isLoading}>
