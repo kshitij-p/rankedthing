@@ -7,6 +7,7 @@ import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
 import { ThemeProvider } from "next-themes";
+import Layout from "~/components/ui/Layout";
 
 const montserrat = Montserrat({
   variable: "--font-inter",
@@ -26,7 +27,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
               font-family: ${montserrat.style.fontFamily};
             }
           `}</style>
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </>
       </ThemeProvider>
     </SessionProvider>

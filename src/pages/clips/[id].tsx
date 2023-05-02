@@ -1,6 +1,5 @@
 import { type Game } from "@prisma/client";
 import { createServerSideHelpers } from "@trpc/react-query/server";
-import clsx from "clsx";
 import {
   type InferGetStaticPropsType,
   type GetStaticProps,
@@ -11,8 +10,16 @@ import Image from "next/image";
 import React, { type ForwardedRef, useMemo } from "react";
 import { z } from "zod";
 import Button from "~/components/ui/Button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "~/components/ui/Dialog";
+import { DialogClose, DialogFooter } from "~/components/ui/Dialog/Dialog";
 import AuthButton from "~/components/util/AuthButton";
 import PageWithFallback from "~/components/util/PageWithFallback";
+import { cn } from "~/lib/utils";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { api, type RouterInputs, type RouterOutputs } from "~/utils/api";
@@ -26,6 +33,38 @@ const getEmbedUrl = (url: string) => {
   }
 
   return `https://www.youtube.com/embed/${id}`;
+};
+
+const HowItWorksDialog = () => {
+  return (
+    <Dialog>
+      <DialogTrigger>
+        <button className="text-lg text-slate-500 md:text-3xl">
+          How it works
+        </button>
+      </DialogTrigger>
+      <DialogContent className="flex h-auto max-h-max flex-col gap-4">
+        <DialogHeader className="text-3xl">
+          <b>How it works</b>
+        </DialogHeader>
+        <div className="text-lg text-slate-200">
+          <p>
+            The rank visible to you before you cast a vote is{" "}
+            <b className="italic underline underline-offset-4">fake</b> and you
+            must guess whether the person
+            {"'"}s real rank is higher or lower. <br /> <br /> If you guess
+            correctly you get points otherwise you get none. The real rank of
+            the person is revealed after you vote.
+          </p>
+        </div>
+        <DialogFooter className="mt-auto self-center">
+          <DialogClose asChild>
+            <Button variants={{ type: "secondary" }}>Ok got it</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 const RankImage = React.forwardRef(
@@ -45,7 +84,7 @@ const RankImage = React.forwardRef(
     return (
       <div
         {...rest}
-        className={clsx("relative aspect-video", className)}
+        className={cn("relative aspect-video", className)}
         ref={passedRef}
       >
         <Image
@@ -137,7 +176,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
       <p className="self-center">{"Player's real rank is"}</p>
 
       <div
-        className={clsx(
+        className={cn(
           "relative z-[1] flex items-start justify-center",
           existingVote !== null && "min-h-[5rem] md:min-h-[6rem]"
         )}
@@ -172,14 +211,14 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
         <fieldset disabled={votingDisabled}>
           <div className={"flex items-center justify-center gap-6 md:gap-14"}>
             <Button
-              className="text-xl md:px-10 md:py-9 md:text-4xl"
+              className="text-xl md:px-10 md:py-8 md:text-4xl"
               variants={{ size: "lg", type: "secondary" }}
               onClick={() => handleVoting({ id: clip.id, guessedHigher: true })}
             >
               Higher
             </Button>
             <Button
-              className="text-xl md:px-10 md:py-9 md:text-4xl"
+              className="text-xl md:px-10 md:py-8 md:text-4xl"
               variants={{ size: "lg", type: "secondary" }}
               onClick={() =>
                 handleVoting({ id: clip.id, guessedHigher: false })
@@ -208,13 +247,15 @@ const GameClipPage = ({
             {embedUrl ? (
               <iframe
                 className="h-full w-full"
+                allowFullScreen
+                sandbox="allow-popups allow-same-origin allow-scripts allow-presentation"
                 src={getEmbedUrl(clip.ytUrl) ?? ""}
               />
             ) : (
               <b>This link is broken sadge ;-;</b>
             )}
           </div>
-          <p className="text-lg text-slate-500 md:text-3xl">How it works</p>
+          <HowItWorksDialog />
         </div>
         <div className="flex flex-col items-center self-center">
           <RankImage

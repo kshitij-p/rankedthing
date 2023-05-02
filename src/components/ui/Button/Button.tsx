@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
-import clsx from "clsx";
 
 import React from "react";
+import { cn } from "~/lib/utils";
 
 const buttonVariants = {
   type: {
@@ -51,7 +51,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        className={clsx(buttonClasses(variants), className)}
+        className={cn(buttonClasses(variants), className)}
         {...rest}
         ref={ref}
       />
