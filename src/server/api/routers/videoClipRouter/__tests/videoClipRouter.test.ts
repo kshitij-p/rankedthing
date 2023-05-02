@@ -6,10 +6,11 @@ import type { GameRank, PrismaClient, VideoClip } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import {
   FakeRankDoesntExistError,
+  FakeRankSameAsRealRankError,
   RealRankDoesntExistError,
 } from "../videoClipRouter";
 
-const makeMockVideoClip = ({ ...rest }: Partial<VideoClip>) => {
+const makeMockVideoClip = (clip?: Partial<VideoClip>) => {
   return {
     ...({
       fakeRankName: "diffRank",
@@ -22,7 +23,19 @@ const makeMockVideoClip = ({ ...rest }: Partial<VideoClip>) => {
       userId: "1",
       ytUrl: "url",
     } satisfies VideoClip),
-    ...rest,
+    ...clip,
+  };
+};
+
+const makeMockRank = (rank?: Partial<GameRank>) => {
+  return {
+    ...({
+      name: "rank",
+      gameId: 1,
+      maxElo: 1,
+      minElo: 1,
+    } satisfies GameRank),
+    ...rank,
   };
 };
 
@@ -33,7 +46,7 @@ describe("create", () => {
     mockClear(prismaMock);
   });
 
-  it("fails to create clip with wrong ranks", async () => {
+  it("fails to create clip with invalid ranks", async () => {
     const ctx = createInnerTRPCContext({
       session: {
         user: {
@@ -49,12 +62,11 @@ describe("create", () => {
       userId: ctx.session?.user.id,
     });
 
-    prismaMock.gameRank.findUnique.mockResolvedValue({
-      gameId: 1,
-      name: "existentRank",
-      maxElo: 1,
-      minElo: 1,
-    } satisfies GameRank);
+    prismaMock.gameRank.findUnique.mockResolvedValue(
+      makeMockRank({
+        name: "existentRank",
+      })
+    );
 
     const caller = appRouter.createCaller({ ...ctx, prisma: prismaMock });
 
@@ -66,7 +78,7 @@ describe("create", () => {
         title: mockClip.title,
         ytUrl: mockClip.ytUrl,
       })
-    ).rejects.toThrow();
+    ).rejects.toThrowError(FakeRankDoesntExistError);
 
     await expect(
       caller.videoClip.create({
@@ -76,10 +88,10 @@ describe("create", () => {
         title: mockClip.title,
         ytUrl: mockClip.ytUrl,
       })
-    ).rejects.toThrow();
+    ).rejects.toThrowError(RealRankDoesntExistError);
   });
 
-  it("fails to update a clip with wrong ranks", async () => {
+  it("fails to update a clip with invalid ranks", async () => {
     const ctx = createInnerTRPCContext({
       session: {
         user: {
@@ -119,5 +131,64 @@ describe("create", () => {
         newFakeRank: "nonExistentRank",
       })
     ).rejects.toThrowError(new TRPCError(FakeRankDoesntExistError));
+  });
+
+  it("fails to create a clip with the same rank", async () => {
+    const ctx = createInnerTRPCContext({
+      session: {
+        user: {
+          id: "test-user-id",
+        },
+        expires: new Date().toISOString(),
+      },
+    });
+
+    const mockClip = makeMockVideoClip();
+
+    prismaMock.videoClip.create.mockResolvedValue(mockClip);
+
+    const caller = appRouter.createCaller({ ...ctx, prisma: prismaMock });
+
+    await expect(
+      caller.videoClip.create({
+        gameId: mockClip.gameId,
+        title: mockClip.title,
+        ytUrl: mockClip.ytUrl,
+        fakeRank: "sameRank",
+        realRank: "sameRank",
+      })
+    ).rejects.toThrowError(FakeRankSameAsRealRankError);
+  });
+
+  it("fails to update a clip with the same rank", async () => {
+    const ctx = createInnerTRPCContext({
+      session: {
+        user: {
+          id: "test-user-id",
+        },
+        expires: new Date().toISOString(),
+      },
+    });
+
+    const mockClip = makeMockVideoClip({ userId: ctx.session?.user.id });
+
+    prismaMock.videoClip.findUnique.mockResolvedValue(mockClip);
+    prismaMock.gameRank.findUnique.mockResolvedValue({
+      gameId: mockClip.gameId,
+      maxElo: 1,
+      minElo: 1,
+      name: "sameRank",
+    });
+    prismaMock.videoClip.update.mockResolvedValue(mockClip);
+
+    const caller = appRouter.createCaller({ ...ctx, prisma: prismaMock });
+
+    await expect(
+      caller.videoClip.update({
+        newFakeRank: "sameRank",
+        newRealRank: "sameRank",
+        id: mockClip.id,
+      })
+    ).rejects.toThrowError(FakeRankSameAsRealRankError);
   });
 });

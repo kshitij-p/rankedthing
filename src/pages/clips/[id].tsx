@@ -132,13 +132,14 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center gap-3 md:gap-6">
+    <div className="mt-2 flex w-full flex-col items-center gap-3 md:mt-4 md:gap-6">
       <p className="self-center">{"Player's real rank is"}</p>
 
       <div
-        className={
-          "relative z-[1] flex min-h-[5rem] items-start justify-center md:min-h-[6rem]"
-        }
+        className={clsx(
+          "relative z-[1] flex items-start justify-center",
+          existingVote !== null && "min-h-[5rem] md:min-h-[6rem]"
+        )}
       >
         {votingDisabled && (
           <div className="item-center absolute inset-0 z-10 flex h-full w-full justify-center bg-neutral-1000/60 backdrop-blur-[2px]">
