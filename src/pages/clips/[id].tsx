@@ -176,7 +176,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
       <div
         className={cn(
           "relative z-[1] flex items-start justify-center",
-          existingVote !== null && "min-h-[5rem] md:min-h-[6rem]"
+          existingVote && "min-h-[5rem] md:min-h-[6rem]"
         )}
       >
         {votingDisabled && (

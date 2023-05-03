@@ -2,6 +2,7 @@ import * as React from "react";
 import * as RadixDialog from "@radix-ui/react-dialog";
 
 import { cn } from "~/lib/utils";
+import NoiseFilter from "~/components/util/NoiseFilter";
 
 const Dialog = RadixDialog.Root;
 
@@ -31,7 +32,7 @@ const DialogOverlay = React.forwardRef<
     {...rest}
     ref={ref}
     className={cn(
-      "fixed inset-0 z-[1399] w-full bg-slate-900/10 backdrop-blur-[6px] transition-all duration-100",
+      "radix-state-close:animate-blurOut fixed inset-0 z-[1399] w-full bg-slate-900/10 backdrop-blur-[6px] transition-all duration-100 radix-state-open:animate-blurIn",
       className
     )}
   />
@@ -84,7 +85,9 @@ const DialogContent = React.forwardRef<
 
     return (
       <DialogPortal>
-        <DialogOverlay />
+        <DialogOverlay className="group">
+          <NoiseFilter className="opacity-[0.07] mix-blend-soft-light" />
+        </DialogOverlay>
         <RadixDialog.Content
           {...rest}
           className={cn(

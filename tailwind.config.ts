@@ -18,6 +18,8 @@ export default {
         appearOut: "appearOut 0.2s ease-in-out forwards",
         slideLeftIn: "slideLeftIn 0.25s ease-in-out forwards",
         slideLeftOut: "slideLeftOut 0.2s ease-in-out forwards",
+        blurIn: "blurIn 0.25s ease-in-out forwards",
+        blurOut: "blurOut 0.2s ease-in-out forwards",
       },
       keyframes: {
         fadeIn: {
@@ -43,6 +45,14 @@ export default {
         slideLeftOut: {
           "0%": { transform: "translateX(0%)" },
           "100%": { transform: "translateX(-100%)" },
+        },
+        blurIn: {
+          "0%": { "backdrop-filter": "blur(0px)" },
+          "100%": { "backdrop-filter": "var(--tw-backdrop-blur)" },
+        },
+        blurOut: {
+          "0%": { "backdrop-filter": "var(--tw-backdrop-blur)" },
+          "100%": { "backdrop-filter": "blur(0px)" },
         },
       },
     },
