@@ -8,6 +8,7 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import Layout from "~/components/ui/Layout";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const montserrat = Montserrat({
   variable: "--font-inter",
@@ -20,6 +21,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <ThemeProvider attribute="class" forcedTheme={"dark"}>
         <>
           <style jsx global>{`

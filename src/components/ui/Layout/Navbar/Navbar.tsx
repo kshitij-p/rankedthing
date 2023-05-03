@@ -11,7 +11,8 @@ const Navbar = () => {
   const noiseFilterRef = useRef<SVGSVGElement | null>(null);
 
   const drawerLinks = [
-    { children: "Clips", href: "/" },
+    { children: "Clips", href: "/clips" },
+    /* To do make the aobut page */
     { children: "About", href: "/" },
   ];
 
@@ -52,7 +53,7 @@ const Navbar = () => {
   return (
     <header className="sticky inset-0 bg-slate-900/10 backdrop-blur-sm">
       <NoiseFilter
-        className="opacity-25 mix-blend-soft-light transition-opacity data-[scroll='0']:opacity-0"
+        className="will-change-opacity opacity-25 mix-blend-soft-light transition-opacity data-[scroll='0']:opacity-0"
         ref={noiseFilterRef}
       />
       <nav className="flex items-center justify-between px-8 py-4 text-lg md:justify-evenly md:text-xl [&>*]:shrink-0">
@@ -69,7 +70,6 @@ const Navbar = () => {
               </li>
             );
           })}
-          {/* To do make the clips page */}
 
           <li>
             <button

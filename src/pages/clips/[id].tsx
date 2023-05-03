@@ -154,6 +154,8 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
     api.clipVote.vote.useMutation({
       onSettled: () => {
         void utils.clipVote.getVoteForClip.invalidate({ clipId: clip.id });
+        void utils.game.getUnvotedClip.invalidate({ gameId: clip.gameId });
+        void utils.game.getAllUnvotedClips.invalidate();
       },
     });
 
