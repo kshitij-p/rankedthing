@@ -38,10 +38,8 @@ const getEmbedUrl = (url: string) => {
 const HowItWorksDialog = () => {
   return (
     <Dialog>
-      <DialogTrigger>
-        <button className="text-lg text-slate-500 md:text-3xl">
-          How it works
-        </button>
+      <DialogTrigger className="text-lg text-slate-500 md:text-3xl">
+        How it works
       </DialogTrigger>
       <DialogContent className="flex h-auto max-h-max flex-col gap-4">
         <DialogHeader className="text-3xl">

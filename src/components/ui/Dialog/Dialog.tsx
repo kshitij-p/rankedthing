@@ -7,17 +7,49 @@ const Dialog = RadixDialog.Root;
 
 const DialogTrigger = RadixDialog.Trigger;
 
+const DEFAULT_PORTAL_POSITION = { x: "center", y: "center" } as {
+  x: "left" | "center" | "right";
+  y: "top" | "center" | "bottom";
+};
+
+type DialogPosition = typeof DEFAULT_PORTAL_POSITION;
+
+const positionLookup: {
+  x: {
+    [k in DialogPosition["x"]]: string;
+  };
+  y: {
+    [k in DialogPosition["y"]]: string;
+  };
+} = {
+  x: {
+    left: "left-0",
+    center: "left-1/2 -translate-x-1/2",
+    right: "right-0",
+  },
+  y: {
+    top: "top-0",
+    center: "top-1/2 -translate-y-1/2",
+    bottom: "bottom-0",
+  },
+};
+
 const DialogPortal = ({
   className,
   children,
   ...rest
-}: RadixDialog.DialogPortalProps) => (
-  <RadixDialog.Portal {...rest} className={cn(className)}>
-    <div className="fixed inset-0 z-[1400] flex items-center justify-center">
+}: RadixDialog.DialogPortalProps & {
+  position?: Partial<DialogPosition>;
+}) => {
+  return (
+    <RadixDialog.Portal
+      {...rest}
+      className={cn("fixed inset-0 z-[1400]", className)}
+    >
       {children}
-    </div>
-  </RadixDialog.Portal>
-);
+    </RadixDialog.Portal>
+  );
+};
 DialogPortal.displayName = RadixDialog.Portal.displayName;
 
 const DialogOverlay = React.forwardRef<
@@ -28,7 +60,7 @@ const DialogOverlay = React.forwardRef<
     {...rest}
     ref={ref}
     className={cn(
-      "-z-1 fixed inset-0 w-full bg-slate-900/5 backdrop-blur-[6px] transition-all duration-100",
+      "fixed inset-0 z-[1399] w-full bg-slate-900/10 backdrop-blur-[6px] transition-all duration-100",
       className
     )}
   />
@@ -37,22 +69,41 @@ DialogOverlay.displayName = RadixDialog.Overlay.displayName;
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof RadixDialog.Content>,
-  React.ComponentPropsWithoutRef<typeof RadixDialog.Content>
->(({ className, children, ...rest }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <RadixDialog.Content
-      {...rest}
-      className={cn(
-        "fixed h-[50rem] max-h-[75vh] w-[50rem] max-w-[90vw] overflow-y-auto rounded bg-neutral-900 p-6",
-        className
-      )}
-      ref={ref}
-    >
-      {children}
-    </RadixDialog.Content>
-  </DialogPortal>
-));
+  React.ComponentPropsWithoutRef<typeof RadixDialog.Content> & {
+    position?: React.ComponentProps<typeof DialogPortal>["position"];
+  }
+>(
+  (
+    {
+      className,
+      children,
+      position: passedPosition = DEFAULT_PORTAL_POSITION,
+      ...rest
+    },
+    ref
+  ) => {
+    const position = { ...DEFAULT_PORTAL_POSITION, ...passedPosition };
+
+    return (
+      <DialogPortal>
+        <DialogOverlay />
+        <RadixDialog.Content
+          {...rest}
+          className={cn(
+            //For some reason origin-top-left seems to scale from center shrug
+            "fixed z-[1400] h-[50rem] max-h-[75vh] w-[50rem] max-w-[90vw] origin-top-left overflow-y-auto rounded bg-neutral-900 p-6 shadow shadow-black/20 radix-state-closed:animate-appearOut radix-state-open:animate-appearIn",
+            positionLookup.x[position.x],
+            positionLookup.y[position.y],
+            className
+          )}
+          ref={ref}
+        >
+          {children}
+        </RadixDialog.Content>
+      </DialogPortal>
+    );
+  }
+);
 DialogContent.displayName = RadixDialog.Content.displayName;
 
 const DialogHeader = ({ ...rest }: React.HTMLAttributes<HTMLDivElement>) => (
