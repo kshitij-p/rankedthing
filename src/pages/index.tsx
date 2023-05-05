@@ -13,12 +13,12 @@ const Home: NextPage = () => {
     staleTime: Infinity,
   });
 
-  //To do invalidate move this to stats router and invalidate the entire stats router when we vote
-  const { data: totalScore } = api.user.getTotalScore.useQuery(
+  const { data: totalScore } = api.stats.getTotalScore.useQuery(
     { id: data?.user.id ?? "0" },
     {
       enabled: data != undefined,
       refetchOnWindowFocus: false,
+      //Cached for infinity because we know exactly when this shld change and this can be an expensive query at scale
       staleTime: Infinity,
     }
   );

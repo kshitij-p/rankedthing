@@ -51,9 +51,10 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="sticky inset-0 bg-slate-900/10 backdrop-blur-sm">
+    <header className="sticky inset-0 z-[1300] bg-slate-900/10 backdrop-blur-sm">
       <NoiseFilter
         className="will-change-opacity opacity-25 mix-blend-soft-light transition-opacity data-[scroll='0']:opacity-0"
+        data-scroll={"0"}
         ref={noiseFilterRef}
       />
       <nav className="flex items-center justify-between px-8 py-4 text-lg md:justify-evenly md:text-xl [&>*]:shrink-0">

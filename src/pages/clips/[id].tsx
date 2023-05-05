@@ -156,6 +156,8 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
         void utils.clipVote.getVoteForClip.invalidate({ clipId: clip.id });
         void utils.game.getUnvotedClip.invalidate({ gameId: clip.gameId });
         void utils.game.getAllUnvotedClips.invalidate();
+
+        void utils.stats.invalidate();
       },
     });
 

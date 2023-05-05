@@ -5,6 +5,9 @@ export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      },
       colors: {
         neutral: {
           1000: "#0d0d0d",
@@ -56,6 +59,7 @@ export default {
         },
       },
     },
+    
   },
   darkMode: "class",
   plugins: [tailwindCssRadix],

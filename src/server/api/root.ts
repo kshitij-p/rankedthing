@@ -3,6 +3,7 @@ import gameRouter from "./routers/gameRouter/gameRouter";
 import userRouter from "./routers/userRouter/userRouter";
 import clipVoteRouter from "./routers/clipVoteRouter/clipVoteRouter";
 import videoClipRouter from "./routers/videoClipRouter/videoClipRouter";
+import statsRouter from "./routers/statsRouter/statsRouter";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
   videoClip: videoClipRouter,
   user: userRouter,
   clipVote: clipVoteRouter,
+  stats: statsRouter,
 });
 
 // export type definition of API
