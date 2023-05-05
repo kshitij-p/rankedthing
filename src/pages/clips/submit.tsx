@@ -2,8 +2,12 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import { type InferGetStaticPropsType, type GetStaticProps } from "next";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Controller } from "react-hook-form";
 import { z } from "zod";
+import GameGridSelect from "~/components/GameGridSelect";
+import Button from "~/components/ui/Button";
 import Form from "~/components/ui/Form";
+import Input from "~/components/ui/Input";
 import ProtectedPage from "~/components/util/ProtectedPage";
 import useForm from "~/hooks/useForm";
 import { appRouter } from "~/server/api/root";
@@ -30,6 +34,7 @@ export const getStaticProps: GetStaticProps<{
 };
 
 const CreateClipSchema = z.object({
+  gameId: z.string(),
   title: z.string().min(1),
   ytUrl: z.string().min(1),
   realRank: z.string().min(1),
@@ -41,11 +46,14 @@ type CreateClipFormValues = z.infer<typeof CreateClipSchema>;
 const ClipSubmitPage = ({
   games,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const form = useForm({ schema: CreateClipSchema });
+  const form = useForm({
+    schema: CreateClipSchema,
+  });
 
-  const [gameId, setGameId] = useState(games[0]?.id.toString() ?? "");
-  const [newClipId, setNewClipId] = useState("");
+  const gameId = form.watch("gameId");
   const parsedGameId = parseInt(gameId);
+
+  const [newClipId, setNewClipId] = useState("");
 
   const { data: gameRanks } = api.game.getRanks.useQuery(
     { gameId: parsedGameId },
@@ -75,7 +83,7 @@ const ClipSubmitPage = ({
       form.setError("realRank", { message: "Cant be same as fake rank" });
       return;
     }
-    createClip({ gameId: parsedGameId, ...data });
+    createClip({ ...data, gameId: parseInt(data.gameId) });
   };
 
   //When fake rank changes, update real rank to something else if they are the same
@@ -104,48 +112,85 @@ const ClipSubmitPage = ({
     form.setValue("realRank", gameRanks[1]?.name ?? "");
   }, [gameRanks, form]);
 
+  const [disabled, setDisabled] = useState(false);
+
   return (
     <div>
       <Form form={form} onSubmit={handleSubmit} disabled={isLoading}>
-        <div className="flex max-w-[15rem] flex-col gap-4">
-          Title - This will not be shown to anyone, its just for your ref
-          <input {...form.register("title")} />
-          Game id
-          <select
-            value={gameId}
-            onChange={(e) => setGameId(e.currentTarget.value)}
-          >
-            {games.map((game) => (
-              <option value={game.id} key={game.id}>
-                {game.title}
-              </option>
-            ))}
-          </select>
-          Fake Rank
-          <select {...form.register("fakeRank")}>
-            {gameRanks.map((gameRank) => (
-              <option value={gameRank.name} key={gameRank.name}>
-                {gameRank.name}
-              </option>
-            ))}
-          </select>
-          Real Rank
-          <select {...form.register("realRank")}>
-            {gameRanks.map((gameRank) => {
-              return (
-                <option
-                  value={gameRank.name}
-                  key={gameRank.name}
-                  disabled={gameRank.name === fakeRank}
-                >
+        <div className="flex items-center justify-center">
+          <div className="flex max-w-max flex-col gap-4 p-4 text-lg md:py-10 md:text-xl">
+            <label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
+              Title (not visible to others)
+              <Input
+                className="w-full max-w-3xl"
+                disabled={disabled}
+                {...form.register("title")}
+              />
+            </label>
+            <input
+              type={"checkbox"}
+              checked={disabled}
+              onChange={(e) => setDisabled(e.currentTarget.checked)}
+            />
+            <Controller
+              name={"gameId"}
+              rules={{ required: true }}
+              control={form.control}
+              render={({ field }) => {
+                return (
+                  <GameGridSelect
+                    {...field}
+                    value={field.value}
+                    onChange={(gameId) => {
+                      field.onChange(gameId);
+                    }}
+                    games={games}
+                  />
+                );
+              }}
+            />
+            Fake Rank
+            <select
+              placeholder={
+                !gameId ? "Select a game to see ranks" : "Select a rank"
+              }
+              {...form.register("fakeRank")}
+            >
+              {gameRanks.map((gameRank) => (
+                <option value={gameRank.name} key={gameRank.name}>
                   {gameRank.name}
                 </option>
-              );
-            })}
-          </select>
-          Yt url
-          <input {...form.register("ytUrl")} />
-          <button type="submit">Create</button>
+              ))}
+            </select>
+            Real Rank
+            <select
+              placeholder={
+                !gameId ? "Select a game to see ranks" : "Select a rank"
+              }
+              {...form.register("realRank")}
+            >
+              {gameRanks.map((gameRank) => {
+                return (
+                  <option
+                    value={gameRank.name}
+                    key={gameRank.name}
+                    disabled={gameRank.name === fakeRank}
+                  >
+                    {gameRank.name}
+                  </option>
+                );
+              })}
+            </select>
+            Yt url
+            <input {...form.register("ytUrl")} />
+            <Button
+              className="max-w-max self-center"
+              type="submit"
+              variants={{ type: "secondary" }}
+            >
+              Create
+            </Button>
+          </div>
         </div>
       </Form>
       {newClipId ? (

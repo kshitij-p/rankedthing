@@ -6,14 +6,15 @@ import { cn } from "~/lib/utils";
 const buttonVariants = {
   type: {
     primary:
-      "bg-teal-500 text-neutral-50 hover:bg-teal-600 hover:text-neutral-100 focus:bg-teal-600 focus:text-neutral-100",
+      "bg-teal-500 text-neutral-50 hover:bg-teal-600 hover:text-neutral-100 focus-visible:bg-teal-600 focus-visible:text-neutral-100",
     secondary:
-      "bg-neutral-1000 text-teal-200 border-teal-500 border-2 hover:bg-teal-900/75 hover:text-teal-300 focus:ring-0 focus:ring-offset-0 focus:bg-teal-900/75 focus:text-teal-300",
-    tertiary: "bg-transparent hover:bg-teal-300/20 focus:bg-teal-300/20",
+      "bg-neutral-1000 text-teal-200 border-teal-500 border-2 hover:bg-teal-900/75 hover:text-teal-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-teal-900/75 focus-visible:text-teal-300",
+    tertiary:
+      "bg-transparent hover:bg-teal-300/20 focus-visible:bg-teal-300/20",
     danger:
-      "bg-red-500 text-neutral-50 hover:bg-red-700 hover:text-neutral-100 focus:ring-red-400 focus:ring-offset-red-900",
+      "bg-red-500 text-neutral-50 hover:bg-red-700 hover:text-neutral-100 focus-visible:ring-red-400 focus-visible:ring-offset-red-900",
     "danger-secondary":
-      "bg-white text-red-600 hover:bg-red-50 hover:text-red-700 focus:bg-red-50 focus:text-red-700 focus:ring-neutral-400 focus:ring-offset-neutral-900",
+      "bg-white text-red-600 hover:bg-red-50 hover:text-red-700 focus-visible:bg-red-50 focus-visible:text-red-700 focus-visible:ring-neutral-400 focus-visible:ring-offset-neutral-900",
   },
   size: {
     sm: "h-9 px-2",
@@ -30,7 +31,7 @@ const DEFAULT_VARIANTS: {
 };
 
 const buttonClasses = cva(
-  "inline-flex items-center justify-center transition rounded font-medium focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 focus:ring-offset-teal-900 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center transition rounded font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-900 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: buttonVariants,
     defaultVariants: DEFAULT_VARIANTS,
