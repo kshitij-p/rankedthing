@@ -27,7 +27,7 @@ const GameGridSelect = React.forwardRef(
         <RadioGroup.RadioGroupItem
           disabled={game.comingSoon}
           className={
-            "group relative aspect-[2/3] w-24 rounded-lg p-2 shadow shadow-black/50 md:w-[10.5rem] md:rounded-xl md:p-4 xl:w-60"
+            "group relative aspect-[2/3] w-24 rounded-lg p-2 shadow shadow-black/50 max-[370px]:w-20 md:w-[10.5rem] md:rounded-xl md:p-4 xl:w-60"
           }
           value={`${game.id}`}
           key={game.id}

@@ -1,6 +1,6 @@
 import { LogIn, LogOut, Menu } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import Link from "next/link";
+import Link from "../../Link";
 import { useEffect, useRef } from "react";
 import NoiseFilter from "~/components/util/NoiseFilter";
 import Drawer from "../../Drawer";
@@ -58,14 +58,14 @@ const Navbar = () => {
         ref={noiseFilterRef}
       />
       <nav className="flex items-center justify-between px-8 py-4 text-lg md:justify-evenly md:text-xl [&>*]:shrink-0">
-        <Link className="text-2xl hover:text-teal-200" href={"/"}>
+        <Link className="text-2xl" href={"/"}>
           <b>RankedThing</b>
         </Link>
         <ul className="flex items-center gap-4 md:gap-16">
           {drawerLinks.map((link, index) => {
             return (
               <li className="hidden md:block" key={index}>
-                <Link className="hover:text-teal-200" href={link.href}>
+                <Link className="" href={link.href}>
                   {link.children}
                 </Link>
               </li>
@@ -74,11 +74,11 @@ const Navbar = () => {
 
           <li>
             <button
-              className="flex items-center justify-center hover:text-teal-200"
+              className="md:underline-teal-anim group flex items-center justify-center focus:outline-0"
               onClick={handleAuth}
             >
               <span className="md:hidden">{data ? <LogOut /> : <LogIn />}</span>
-              <span className="hidden md:inline">
+              <span className="hidden group-focus:text-teal-200 md:inline">
                 {data ? "Sign out" : "Sign in"}
               </span>
             </button>
@@ -89,11 +89,7 @@ const Navbar = () => {
               <div className="flex flex-col gap-8 p-2 text-2xl">
                 {drawerLinks.map((link, index) => {
                   return (
-                    <Link
-                      className="hover:text-teal-200"
-                      key={index}
-                      href={link.href}
-                    >
+                    <Link className="" key={index} href={link.href}>
                       {link.children}
                     </Link>
                   );

@@ -1,5 +1,6 @@
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { type InferGetStaticPropsType, type GetStaticProps } from "next";
+import Link from "~/components/ui/Link";
 import { useRouter } from "next/router";
 import React, { useState, useRef } from "react";
 import { Controller } from "react-hook-form";
@@ -101,9 +102,12 @@ const ClipsIndexPage = ({
     <div className="p-6 md:p-10">
       <Form form={form} onSubmit={handleGet} disabled={isLoading || isFetching}>
         <div className="flex flex-col items-center gap-4 md:gap-10">
-          <h2 className="self-center text-xl md:text-3xl">
-            <b>Get random clips</b>
-          </h2>
+          <div className="flex flex-col items-center gap-1">
+            <h2 className="self-center text-xl md:text-3xl">
+              <b>Get clips of</b>
+            </h2>
+          </div>
+
           <Controller
             name={"gameId"}
             rules={{ required: true }}
@@ -135,14 +139,20 @@ const ClipsIndexPage = ({
             </b>
           ) : null}
 
-          <Button
-            type="submit"
-            disabled={noMoreClipsAvailableErr !== undefined}
-            className="mt-4 max-w-max text-sm md:mt-8 md:px-6 md:py-8 md:text-3xl "
-            variants={{ type: "secondary" }}
-          >
-            Get clip
-          </Button>
+          <div className="mt-3 flex flex-col items-center gap-2 md:gap-4">
+            <Button
+              className="mt-4 max-w-max text-base md:mt-8 md:px-6 md:py-8 md:text-3xl "
+              type="submit"
+              disabled={noMoreClipsAvailableErr !== undefined}
+              variants={{ type: "secondary" }}
+            >
+              Get a clip
+            </Button>
+            <strong className="text-xs italic md:text-base">or</strong>
+            <Link className="text-sm md:text-lg" href={"/clips/submit"}>
+              Post your own clip
+            </Link>
+          </div>
         </div>
       </Form>
     </div>
