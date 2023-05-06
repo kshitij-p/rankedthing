@@ -33,7 +33,7 @@ export const getStaticProps: GetStaticProps<{
 };
 
 const GetClipSchema = z.object({
-  gameId: z.string(),
+  gameId: z.string().min(1),
 });
 
 const ClipsIndexPage = ({
@@ -43,9 +43,7 @@ const ClipsIndexPage = ({
 
   const form = useForm({
     schema: GetClipSchema,
-    defaultValues: {
-      gameId: games[0]?.id.toString(),
-    },
+
     criteriaMode: "all",
   });
   const noMoreClipsAvailableErr = form.formState.errors.root;

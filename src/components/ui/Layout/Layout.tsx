@@ -5,7 +5,7 @@ const Layout = ({ children }: React.PropsWithChildren) => {
   return (
     <>
       <Navbar />
-      {children}
+      <main>{children}</main>
     </>
   );
 };

@@ -37,7 +37,7 @@ const getEmbedUrl = (url: string) => {
 const HowItWorksDialog = () => {
   return (
     <Dialog>
-      <DialogTrigger className="text-lg text-slate-500 md:text-3xl">
+      <DialogTrigger className="text-lg text-neutral-700 underline underline-offset-4 transition hover:text-slate-400 focus:outline-0 focus-visible:text-slate-400 md:text-3xl md:underline-offset-8">
         How it works
       </DialogTrigger>
       <DialogContent className="flex h-auto max-h-max flex-col gap-4">
