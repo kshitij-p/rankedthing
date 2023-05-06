@@ -32,6 +32,7 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-dark-teal">
         {totalScore !== undefined && <p>Total score: {`${totalScore}`}</p>}
+        <Link href={"/me"}>My profile</Link>
         <div>
           Games we support:
           <ul>

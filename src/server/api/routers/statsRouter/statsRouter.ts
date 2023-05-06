@@ -3,7 +3,11 @@
  */
 
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../../trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "../../trpc";
 
 const statsRouter = createTRPCRouter({
   getTotalScore: publicProcedure
@@ -23,6 +27,27 @@ const statsRouter = createTRPCRouter({
 
       return totalScore;
     }),
+  getClipsHistory: protectedProcedure.query(
+    async ({ ctx: { prisma, session } }) => {
+      const clips = await prisma.clipVote.findMany({
+        where: {
+          userId: session.user.id,
+        },
+        include: {
+          clip: {
+            include: {
+              game: true,
+            },
+          },
+        },
+        orderBy: {
+          submittedAt: "desc",
+        },
+      });
+
+      return clips;
+    }
+  ),
 });
 
 export default statsRouter;

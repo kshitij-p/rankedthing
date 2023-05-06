@@ -12,8 +12,8 @@ const Navbar = () => {
 
   const drawerLinks = [
     { children: "Clips", href: "/clips" },
+    { children: "Profile", href: "/me" },
     /* To do make the aobut page */
-    { children: "About", href: "/" },
   ];
 
   const handleAuth = () => (data ? void signOut() : void signIn("google"));

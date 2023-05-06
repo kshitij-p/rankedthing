@@ -1,4 +1,3 @@
-import { type Game } from "@prisma/client";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import {
   type InferGetStaticPropsType,
@@ -6,9 +5,9 @@ import {
   type GetStaticPaths,
 } from "next";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
-import React, { type ForwardedRef, useMemo } from "react";
+import React, { useMemo } from "react";
 import { z } from "zod";
+import RankImage from "~/components/ranks/RankImage";
 import Button from "~/components/ui/Button";
 import {
   Dialog,
@@ -64,39 +63,6 @@ const HowItWorksDialog = () => {
     </Dialog>
   );
 };
-
-const RankImage = React.forwardRef(
-  (
-    {
-      rankName,
-      game,
-      className,
-      ...rest
-    }: React.ComponentProps<"div"> & {
-      game: Omit<Partial<Game>, "shortTitle" | "title"> &
-        Pick<Game, "shortTitle" | "title">;
-      rankName: string;
-    },
-    passedRef: ForwardedRef<HTMLDivElement>
-  ) => {
-    return (
-      <div
-        {...rest}
-        className={cn("relative aspect-video", className)}
-        ref={passedRef}
-      >
-        <Image
-          className="object-contain"
-          src={`/images/${game.shortTitle}/ranks/${rankName}.png`}
-          alt={`Icon of ${rankName} - a rank in ${game.shortTitle}`}
-          fill
-        />
-      </div>
-    );
-  }
-);
-
-RankImage.displayName = "RankImage";
 
 type PageClip = Omit<
   RouterOutputs["videoClip"]["getById"],
