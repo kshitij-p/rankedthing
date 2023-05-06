@@ -27,12 +27,12 @@ const GameGridSelect = React.forwardRef(
         <RadioGroup.RadioGroupItem
           disabled={game.comingSoon}
           className={
-            "group relative aspect-[2/3] w-24 rounded-lg shadow shadow-black/50 md:w-[10.5rem] md:rounded-xl xl:w-60"
+            "group relative aspect-[2/3] w-24 rounded-lg p-2 shadow shadow-black/50 md:w-[10.5rem] md:rounded-xl md:p-4 xl:w-60"
           }
           value={`${game.id}`}
           key={game.id}
         >
-          <RadioGroup.RadioGroupIndicator className="after:z-1 absolute inset-0 z-10 flex aspect-square h-full w-full flex-col items-center justify-center gap-1 rounded-[inherit] bg-teal-600/50 p-2 backdrop-blur-[2px] after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-radial after:from-transparent after:to-black/50 after:content-[''] md:p-4">
+          <RadioGroup.RadioGroupIndicator className="after:z-1 absolute inset-0 z-[1] flex aspect-square h-full w-full flex-col items-center justify-center gap-1 rounded-[inherit] bg-teal-600/50 backdrop-blur-[2px] after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-radial after:from-transparent after:to-black/50 after:content-['']">
             <NoiseFilter className="rounded-[inherit] opacity-[0.15] mix-blend-overlay" />
             <b className="max-h-full max-w-full overflow-x-hidden text-ellipsis text-xs md:text-2xl">
               {game.title}

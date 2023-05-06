@@ -16,7 +16,7 @@ const Home: NextPage = () => {
   const { data: totalScore } = api.stats.getTotalScore.useQuery(
     { id: data?.user.id ?? "0" },
     {
-      enabled: data != undefined,
+      enabled: data !== undefined,
       refetchOnWindowFocus: false,
       //Cached for infinity because we know exactly when this shld change and this can be an expensive query at scale
       staleTime: Infinity,

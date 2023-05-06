@@ -10,7 +10,7 @@ const Input = React.forwardRef(
       <input
         {...rest}
         className={cn(
-          "hover h-10 rounded-md border border-teal-600 bg-transparent px-3 py-2 hover:border-teal-500 focus-visible:border-teal-700 focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 focus-visible:hover:border-teal-600 disabled:opacity-50",
+          "hover h-10 rounded-md border border-teal-600 bg-transparent px-3 py-2 transition hover:border-teal-500 focus-visible:border-teal-700 focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 focus-visible:hover:border-teal-600 disabled:opacity-50",
           className
         )}
         ref={passedRef}

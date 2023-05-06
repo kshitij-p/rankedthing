@@ -122,7 +122,7 @@ const videoClipRouter = createTRPCRouter({
           });
         }
 
-        if (toUpdate.userId != session.user.id) {
+        if (toUpdate.userId !== session.user.id) {
           throw new TRPCError({
             code: "UNAUTHORIZED",
             message: "You aren't authorized to do this",
@@ -173,7 +173,7 @@ const videoClipRouter = createTRPCRouter({
         });
       }
 
-      if (toDelete.userId != session.user.id) {
+      if (toDelete.userId !== session.user.id) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You aren't authorized to do this",

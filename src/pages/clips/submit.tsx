@@ -1,3 +1,4 @@
+import { SelectTrigger, SelectValue, SelectItem } from "~/components/ui/Select";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { type InferGetStaticPropsType, type GetStaticProps } from "next";
 import Link from "next/link";
@@ -8,12 +9,14 @@ import GameGridSelect from "~/components/GameGridSelect";
 import Button from "~/components/ui/Button";
 import Form from "~/components/ui/Form";
 import Input from "~/components/ui/Input";
+import { Select, SelectContent } from "~/components/ui/Select";
 import ProtectedPage from "~/components/util/ProtectedPage";
 import useForm from "~/hooks/useForm";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { api, type RouterOutputs } from "~/utils/api";
 import { TIME_IN_SECS } from "~/utils/client";
+import Label from "~/components/ui/Label";
 
 export const getStaticProps: GetStaticProps<{
   games: RouterOutputs["game"]["getAll"];
@@ -112,26 +115,15 @@ const ClipSubmitPage = ({
     form.setValue("realRank", gameRanks[1]?.name ?? "");
   }, [gameRanks, form]);
 
-  const [disabled, setDisabled] = useState(false);
-
   return (
     <div>
       <Form form={form} onSubmit={handleSubmit} disabled={isLoading}>
         <div className="flex items-center justify-center">
-          <div className="flex max-w-max flex-col gap-4 p-4 text-lg md:py-10 md:text-xl">
-            <label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
+          <div className="flex max-w-max flex-col gap-6 p-4 text-lg md:gap-8 md:py-10 md:text-xl">
+            <Label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
               Title (not visible to others)
-              <Input
-                className="w-full max-w-3xl"
-                disabled={disabled}
-                {...form.register("title")}
-              />
-            </label>
-            <input
-              type={"checkbox"}
-              checked={disabled}
-              onChange={(e) => setDisabled(e.currentTarget.checked)}
-            />
+              <Input className="w-full max-w-3xl" {...form.register("title")} />
+            </Label>
             <Controller
               name={"gameId"}
               rules={{ required: true }}
@@ -149,40 +141,81 @@ const ClipSubmitPage = ({
                 );
               }}
             />
-            Fake Rank
-            <select
-              placeholder={
-                !gameId ? "Select a game to see ranks" : "Select a rank"
-              }
-              {...form.register("fakeRank")}
-            >
-              {gameRanks.map((gameRank) => (
-                <option value={gameRank.name} key={gameRank.name}>
-                  {gameRank.name}
-                </option>
-              ))}
-            </select>
-            Real Rank
-            <select
-              placeholder={
-                !gameId ? "Select a game to see ranks" : "Select a rank"
-              }
-              {...form.register("realRank")}
-            >
-              {gameRanks.map((gameRank) => {
+            <Controller
+              name="fakeRank"
+              render={({ field }) => {
+                const disabled = !gameId?.length;
                 return (
-                  <option
-                    value={gameRank.name}
-                    key={gameRank.name}
-                    disabled={gameRank.name === fakeRank}
-                  >
-                    {gameRank.name}
-                  </option>
+                  <Label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
+                    Fake rank
+                    <Select
+                      disabled={disabled}
+                      //Placeholder doesnt work unless value is set
+                      value={field.value ? field.value : undefined}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="truncate">
+                        <SelectValue
+                          placeholder={
+                            disabled
+                              ? "Select a game to see ranks"
+                              : "Select a game"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {gameRanks.map((gameRank) => (
+                          <SelectItem value={gameRank.name} key={gameRank.name}>
+                            {gameRank.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Label>
                 );
-              })}
-            </select>
-            Yt url
-            <input {...form.register("ytUrl")} />
+              }}
+              control={form.control}
+            />
+            <Controller
+              name="realRank"
+              render={({ field }) => {
+                const disabled = !gameId?.length;
+                return (
+                  <Label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
+                    Real rank
+                    <Select
+                      disabled={disabled}
+                      //Placeholder doesnt work unless value is set
+                      value={field.value ? field.value : undefined}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="truncate">
+                        <SelectValue
+                          placeholder={
+                            disabled
+                              ? "Select a game to see ranks"
+                              : "Select a game"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {gameRanks.map((gameRank) => (
+                          <SelectItem value={gameRank.name} key={gameRank.name}>
+                            {gameRank.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Label>
+                );
+              }}
+              control={form.control}
+            />
+            <Label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
+              Youtube link of your clip
+              <Input className="w-full max-w-3xl" {...form.register("ytUrl")} />
+            </Label>
+
             <Button
               className="max-w-max self-center"
               type="submit"
@@ -190,12 +223,15 @@ const ClipSubmitPage = ({
             >
               Create
             </Button>
+
+            {newClipId ? (
+              <Link href={`/clips/${newClipId}`}>
+                Success! Created your clip
+              </Link>
+            ) : null}
           </div>
         </div>
       </Form>
-      {newClipId ? (
-        <Link href={`/clips/${newClipId}`}>Success! Created your clip</Link>
-      ) : null}
     </div>
   );
 };

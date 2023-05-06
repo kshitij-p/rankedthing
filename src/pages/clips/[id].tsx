@@ -26,7 +26,7 @@ import { api, type RouterInputs, type RouterOutputs } from "~/utils/api";
 import { getFromParam, TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
 
 const getEmbedUrl = (url: string) => {
-  const id = url.split("?v=")?.[1];
+  const id = url.split("?v=")?.[1] ?? url.split("shorts/")?.[1];
 
   if (!id) {
     return null;
