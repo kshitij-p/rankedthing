@@ -1,28 +1,55 @@
-import { type NextPage } from "next";
+import { type InferGetStaticPropsType, type GetStaticProps } from "next";
 import Head from "next/head";
-import { useSession } from "next-auth/react";
-import { api } from "~/utils/api";
 import Link from "next/link";
-import AuthButton from "~/components/util/AuthButton";
+import { cn } from "~/lib/utils";
+import Image from "next/image";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { createInnerTRPCContext } from "~/server/api/trpc";
+import { appRouter } from "~/server/api/root";
+import { type Game } from "@prisma/client";
+import { TIME_IN_SECS } from "~/utils/client";
 
-const Home: NextPage = () => {
-  const { data } = useSession();
-
-  const { data: games } = api.game.getAll.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
+export const getStaticProps: GetStaticProps<{
+  games: Array<
+    Game & {
+      comingSoon?: boolean;
+    }
+  >;
+}> = async () => {
+  const caller = createServerSideHelpers({
+    ctx: createInnerTRPCContext({ session: null }),
+    router: appRouter,
   });
 
-  const { data: totalScore } = api.stats.getTotalScore.useQuery(
-    { id: data?.user.id ?? "0" },
-    {
-      enabled: data !== undefined,
-      refetchOnWindowFocus: false,
-      //Cached for infinity because we know exactly when this shld change and this can be an expensive query at scale
-      staleTime: Infinity,
+  const games: Array<
+    Game & {
+      comingSoon?: boolean;
     }
-  );
+  > = [
+    ...(await caller.game.getAll.fetch()),
+    {
+      id: -1,
+      shortTitle: "apex",
+      title: "Apex legends",
+      comingSoon: true,
+    },
+    {
+      id: -2,
+      shortTitle: "overwatch2",
+      title: "Overwatch 2",
+      comingSoon: true,
+    },
+  ];
 
+  return {
+    props: {
+      games,
+    },
+    revalidate: TIME_IN_SECS.ONE_HOUR,
+  };
+};
+
+const Home = ({ games }: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <>
       <Head>
@@ -31,22 +58,55 @@ const Home: NextPage = () => {
         {/* To do replace this favicon with a cat one */}
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex min-h-screen flex-col items-center justify-center bg-dark-teal">
-        {totalScore !== undefined && <p>Total score: {`${totalScore}`}</p>}
-        <Link href={"/me"}>My profile</Link>
-        <div>
-          Games we support:
-          <ul>
-            {games?.map((game) => (
-              <li key={game.id}>
-                <Link prefetch={false} href={`/games/${game.shortTitle}`}>
-                  {game.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <div className="flex flex-col items-center gap-8 bg-dark-teal px-6 py-10 text-slate-200 md:gap-16 md:px-12 md:py-24 xl:py-32">
+        <div className="flex flex-col items-center gap-2 md:gap-3">
+          <h2 className="text-3xl font-bold text-slate-100 md:text-5xl">
+            RankedThing
+          </h2>
+          <p className="text-center font-light text-neutral-300 md:w-3/4 md:text-xl">
+            Guess whether a person is secretly goated or coping about his rank
+            and earn points!
+          </p>
         </div>
-        <AuthButton />
+        <div>
+          <div className="mt-4 flex flex-col items-center justify-center gap-2 md:mt-8 md:gap-6">
+            <h3 className="self-start text-xl font-semibold md:text-3xl xl:text-3xl">
+              Featured Games
+            </h3>
+            <div className="grid max-w-max grid-cols-3 gap-3 gap-y-4 md:gap-4 md:gap-y-6 lg:grid-cols-4 lg:place-items-center [&>*]:shrink-0">
+              {games.map((game) => {
+                return (
+                  <Link
+                    tabIndex={game.comingSoon ? -1 : 0}
+                    data-disabled={game.comingSoon}
+                    data-enabled={!game.comingSoon}
+                    className={cn(
+                      "group relative flex aspect-[2/3] w-24 items-center justify-center rounded-lg p-2 shadow shadow-black/50 transition focus:outline-0 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-4 focus-visible:ring-offset-neutral-950 data-[disabled=true]:cursor-default data-[enabled=true]:hover:-translate-y-1 data-[enabled=true]:focus-visible:-translate-y-1 max-[370px]:w-20 md:w-[10.5rem] md:rounded-xl md:p-4 md:focus-visible:ring-offset-8 xl:w-60"
+                    )}
+                    href={game.comingSoon ? "" : `/games/${game.shortTitle}`}
+                    key={game.id}
+                  >
+                    {game.comingSoon && (
+                      <b className="relative z-10 max-h-full max-w-full overflow-x-hidden text-ellipsis text-center text-xs md:text-2xl">
+                        Coming soon
+                      </b>
+                    )}
+                    <Image
+                      data-disabled={game.comingSoon}
+                      data-enabled={!game.comingSoon}
+                      className={cn(
+                        "relative flex rounded-[inherit] brightness-75 transition data-[disabled=true]:opacity-25 data-[disabled=true]:blur-[1px] data-[enabled=true]:hover:brightness-105 data-[enabled=true]:group-focus-visible:brightness-105"
+                      )}
+                      src={`/images/${game.shortTitle}/banner.jpg`}
+                      alt={`A banner image of ${game.title}`}
+                      fill
+                    />
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
