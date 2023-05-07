@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import {
   FakeRankDoesntExistError,
   FakeRankSameAsRealRankError,
+  InvalidYtUrlError,
   RealRankDoesntExistError,
 } from "../videoClipRouter";
 
@@ -21,7 +22,7 @@ const makeMockVideoClip = (clip?: Partial<VideoClip>) => {
       updatedAt: new Date(),
       title: "title",
       userId: "1",
-      ytUrl: "url",
+      ytUrl: "https://www.youtube.com/watch?v=ILMHmEADlwY",
     } satisfies VideoClip),
     ...clip,
   };
@@ -44,6 +45,43 @@ describe("create", () => {
 
   beforeEach(() => {
     mockClear(prismaMock);
+  });
+
+  it("fails to create with invalid yt url", async () => {
+    const ctx = createInnerTRPCContext({
+      session: {
+        user: {
+          id: "test-user-id",
+        },
+        expires: new Date().toISOString(),
+      },
+    });
+
+    const mockClip = makeMockVideoClip({
+      fakeRankName: "existentRank",
+      realRankName: "existentRank",
+      userId: ctx.session?.user.id,
+      ytUrl: "invalidurl",
+    });
+
+    prismaMock.gameRank.findUnique.mockResolvedValue(
+      makeMockRank({
+        name: mockClip.fakeRankName,
+      })
+    );
+
+    const caller = appRouter.createCaller({ ...ctx, prisma: prismaMock });
+
+    await expect(
+      caller.videoClip.create({
+        ...mockClip,
+        gameId: mockClip.gameId,
+        fakeRank: mockClip.fakeRankName,
+        realRank: mockClip.realRankName,
+        title: mockClip.title,
+        ytUrl: mockClip.ytUrl,
+      })
+    ).rejects.toThrowError(InvalidYtUrlError);
   });
 
   it("fails to create clip with invalid ranks", async () => {

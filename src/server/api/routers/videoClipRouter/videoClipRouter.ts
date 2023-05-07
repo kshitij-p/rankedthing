@@ -1,6 +1,7 @@
 import { type PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { isValidYtUrl } from "~/utils/client";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -26,6 +27,11 @@ export const RealRankDoesntExistError = new TRPCError({
 export const FakeRankSameAsRealRankError = new TRPCError({
   code: "BAD_REQUEST",
   message: "Fake rank can't be same as real rank.",
+});
+
+export const InvalidYtUrlError = new TRPCError({
+  code: "BAD_REQUEST",
+  message: "Provided youtube url is invalid.",
 });
 
 const videoClipRouter = createTRPCRouter({
@@ -65,6 +71,10 @@ const videoClipRouter = createTRPCRouter({
         ctx: { prisma, session },
         input: { realRank, fakeRank, ytUrl, title, gameId },
       }) => {
+        if (!isValidYtUrl(ytUrl)) {
+          throw InvalidYtUrlError;
+        }
+
         if (fakeRank === realRank) {
           throw FakeRankSameAsRealRankError;
         }
@@ -106,6 +116,22 @@ const videoClipRouter = createTRPCRouter({
         ctx: { prisma, session },
         input: { id, newFakeRank, newRealRank, newTitle, newYtUrl },
       }) => {
+        if (newYtUrl && !isValidYtUrl(newYtUrl)) {
+          throw InvalidYtUrlError;
+        }
+
+        if (newFakeRank && !(await isValidRank(newFakeRank, prisma))) {
+          throw FakeRankDoesntExistError;
+        }
+
+        if (newRealRank && !(await isValidRank(newRealRank, prisma))) {
+          throw RealRankDoesntExistError;
+        }
+
+        if (newFakeRank && newRealRank && newFakeRank === newFakeRank) {
+          throw FakeRankSameAsRealRankError;
+        }
+
         const toUpdate = await prisma.videoClip.findUnique({
           where: {
             id,
@@ -127,18 +153,6 @@ const videoClipRouter = createTRPCRouter({
             code: "UNAUTHORIZED",
             message: "You aren't authorized to do this",
           });
-        }
-
-        if (newFakeRank && !(await isValidRank(newFakeRank, prisma))) {
-          throw FakeRankDoesntExistError;
-        }
-
-        if (newRealRank && !(await isValidRank(newRealRank, prisma))) {
-          throw RealRankDoesntExistError;
-        }
-
-        if (newFakeRank && newRealRank && newFakeRank === newFakeRank) {
-          throw FakeRankSameAsRealRankError;
         }
 
         return await prisma.videoClip.update({

@@ -15,7 +15,7 @@ import useForm from "~/hooks/useForm";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { api, type RouterOutputs } from "~/utils/api";
-import { TIME_IN_SECS } from "~/utils/client";
+import { isValidYtUrl, TIME_IN_SECS } from "~/utils/client";
 import Label from "~/components/ui/Label";
 import { Eye, EyeOff } from "lucide-react";
 import ErrorText from "~/components/ui/ErrorText";
@@ -40,18 +40,25 @@ export const getStaticProps: GetStaticProps<{
 
 const CreateClipSchema = z.object({
   gameId: z.string({ required_error: "Choose a game" }).min(1),
+
   title: z
     .string({ required_error: "Must have atleast 1 character" })
     .min(1, { message: "Must have atleast 1 character" }),
-  ytUrl: z
-    .string({ required_error: "Must have atleast 1 character" })
-    .min(1, { message: "Must have atleast 1 character" }),
+
   realRank: z
     .string({ required_error: "Select a rank" })
     .min(1, { message: "Select a rank" }),
+
   fakeRank: z
     .string({ required_error: "Select a valid rank" })
     .min(1, { message: "Select a rank" }),
+
+  ytUrl: z
+    .string({ required_error: "Must have atleast 1 character" })
+    .min(1, { message: "Must have atleast 1 character" })
+    .refine(isValidYtUrl, {
+      message: "Must be a valid youtube url",
+    }),
 });
 
 type CreateClipFormValues = z.infer<typeof CreateClipSchema>;
