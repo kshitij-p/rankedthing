@@ -66,6 +66,8 @@ type CreateClipFormValues = z.infer<typeof CreateClipSchema>;
 const ClipSubmitPage = ({
   games,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const utils = api.useContext();
+
   const form = useForm({
     schema: CreateClipSchema,
   });
@@ -92,6 +94,9 @@ const ClipSubmitPage = ({
   const realRank = form.watch("realRank", "");
 
   const { mutate: createClip, isLoading } = api.videoClip.create.useMutation({
+    onSettled: () => {
+      void utils.stats.getClipsCountForGame.invalidate();
+    },
     onSuccess: (newClip) => {
       setNewClipId(newClip.id);
     },

@@ -8,6 +8,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "../../trpc";
+import { GAME_ID_SCHEMA } from "../gameRouter/gameRouter";
 
 const statsRouter = createTRPCRouter({
   getTotalScore: publicProcedure
@@ -48,6 +49,52 @@ const statsRouter = createTRPCRouter({
       return clips;
     }
   ),
+  getClipsCountForGame: publicProcedure
+    .input(z.object({ gameId: GAME_ID_SCHEMA }))
+    .query(async ({ ctx: { prisma }, input: { gameId } }) => {
+      const query = await prisma.videoClip.aggregate({
+        where: {
+          gameId: gameId,
+        },
+        _count: true,
+      });
+
+      return query._count;
+    }),
+  getVotedClipsCountForGame: protectedProcedure
+    .input(z.object({ gameId: GAME_ID_SCHEMA }))
+    .query(async ({ ctx: { prisma, session }, input: { gameId } }) => {
+      const query = await prisma.videoClip.aggregate({
+        where: {
+          gameId: gameId,
+          ClipVote: {
+            some: {
+              userId: session.user.id,
+            },
+          },
+        },
+        _count: true,
+      });
+
+      return query._count;
+    }),
+  getScoreForGame: protectedProcedure
+    .input(z.object({ gameId: GAME_ID_SCHEMA }))
+    .query(async ({ ctx: { prisma, session }, input: { gameId } }) => {
+      const query = await prisma.clipVote.aggregate({
+        where: {
+          userId: session.user.id,
+          clip: {
+            gameId: gameId,
+          },
+        },
+        _sum: {
+          score: true,
+        },
+      });
+
+      return query._sum.score ?? 0;
+    }),
 });
 
 export default statsRouter;

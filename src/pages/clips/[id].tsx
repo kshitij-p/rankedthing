@@ -31,7 +31,7 @@ const getEmbedUrl = (url: string) => {
     return null;
   }
 
-  return `https://www.youtube.com/embed/${id}`;
+  return `https://www.youtube-nocookie.com/embed/${id}`;
 };
 
 const HowItWorksDialog = () => {
@@ -111,7 +111,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
   const { data: existingVote } = api.clipVote.getVoteForClip.useQuery(
     { clipId: clip.id },
     {
-      enabled: sessionData !== null,
+      enabled: status === "authenticated",
       staleTime: TIME_IN_MS.ONE_MINUTE,
     }
   );
@@ -120,6 +120,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
     api.clipVote.vote.useMutation({
       onSettled: () => {
         void utils.clipVote.getVoteForClip.invalidate({ clipId: clip.id });
+
         void utils.game.getUnvotedClip.invalidate({ gameId: clip.gameId });
         void utils.game.getAllUnvotedClips.invalidate();
 
@@ -216,6 +217,7 @@ const GameClipPage = ({
               <iframe
                 className="h-full w-full"
                 allowFullScreen
+                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
                 sandbox="allow-popups allow-same-origin allow-scripts allow-presentation"
                 src={getEmbedUrl(clip.ytUrl) ?? ""}
               />

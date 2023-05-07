@@ -41,7 +41,7 @@ const GetClipSchema = z.object({
 const ClipsIndexPage = ({
   games,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { data } = useSession();
+  const { data, status } = useSession();
   const router = useRouter();
 
   const form = useForm({
@@ -64,15 +64,15 @@ const ClipsIndexPage = ({
   } = api.game.getUnvotedClip.useQuery(
     { gameId },
     {
-      enabled: queryEnabled && data !== null,
+      enabled: queryEnabled && status === "authenticated",
       initialData: null,
       initialDataUpdatedAt: 0,
       staleTime: TIME_IN_MS.FIVE_MINUTES,
       onSettled: (clip, err) => {
+        setQueryEnabled(false);
         if (err) {
           return;
         }
-        setQueryEnabled(false);
 
         if (clip) {
           void router.push(`/clips/${clip.id}`);

@@ -17,6 +17,7 @@ it("checks if a yt url is valid or not", () => {
     },
 
     //To do fix these - Failing cases
+    //To do fix all cases in https://stackoverflow.com/questions/28735459/how-to-validate-youtube-url-in-client-side-in-text-box
     { url: "https://youtu.be/ILMHmEADlwY", expected: false },
     { url: "https://www.youtube.com/embed/ILMHmEADlwY", expected: false },
 
