@@ -17,6 +17,8 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import { api, type RouterOutputs } from "~/utils/api";
 import { TIME_IN_SECS } from "~/utils/client";
 import Label from "~/components/ui/Label";
+import { Eye, EyeOff } from "lucide-react";
+import ErrorText from "~/components/ui/ErrorText";
 
 export const getStaticProps: GetStaticProps<{
   games: RouterOutputs["game"]["getAll"];
@@ -37,11 +39,19 @@ export const getStaticProps: GetStaticProps<{
 };
 
 const CreateClipSchema = z.object({
-  gameId: z.string(),
-  title: z.string().min(1),
-  ytUrl: z.string().min(1),
-  realRank: z.string().min(1),
-  fakeRank: z.string().min(1),
+  gameId: z.string({ required_error: "Choose a game" }).min(1),
+  title: z
+    .string({ required_error: "Must have atleast 1 character" })
+    .min(1, { message: "Must have atleast 1 character" }),
+  ytUrl: z
+    .string({ required_error: "Must have atleast 1 character" })
+    .min(1, { message: "Must have atleast 1 character" }),
+  realRank: z
+    .string({ required_error: "Select a rank" })
+    .min(1, { message: "Select a rank" }),
+  fakeRank: z
+    .string({ required_error: "Select a valid rank" })
+    .min(1, { message: "Select a rank" }),
 });
 
 type CreateClipFormValues = z.infer<typeof CreateClipSchema>;
@@ -113,6 +123,12 @@ const ClipSubmitPage = ({
     }
     form.setValue("fakeRank", gameRanks[0]?.name ?? "");
     form.setValue("realRank", gameRanks[1]?.name ?? "");
+    if (gameRanks[0]) {
+      form.clearErrors("fakeRank");
+    }
+    if (gameRanks[1]) {
+      form.clearErrors("realRank");
+    }
   }, [gameRanks, form]);
 
   return (
@@ -121,17 +137,24 @@ const ClipSubmitPage = ({
         <div className="flex items-center justify-center">
           <div className="flex max-w-max flex-col gap-6 p-4 text-lg md:gap-8 md:py-10 md:text-xl">
             <Label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
-              Title (not visible to others)
+              <span className="flex items-center gap-2">
+                Title
+                <span title="Not shown to others ever">
+                  <EyeOff className="w-[1rem] text-neutral-500" />
+                </span>
+              </span>
               <Input className="w-full max-w-3xl" {...form.register("title")} />
+              <ErrorText className="text-sm md:text-lg" inputName="title" />
             </Label>
             <Controller
               name={"gameId"}
               rules={{ required: true }}
               control={form.control}
-              render={({ field }) => {
+              render={({ field, fieldState }) => {
                 return (
                   <GameGridSelect
                     {...field}
+                    error={fieldState.error}
                     value={field.value}
                     onChange={(gameId) => {
                       field.onChange(gameId);
@@ -147,12 +170,18 @@ const ClipSubmitPage = ({
                 const disabled = !gameId?.length;
                 return (
                   <Label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
-                    Fake rank
+                    <span className="flex items-center gap-2">
+                      Fake Rank
+                      <span title="Visible to others">
+                        <Eye className="w-[1rem] text-neutral-300" />
+                      </span>
+                    </span>
                     <Select
                       disabled={disabled}
                       //Placeholder doesnt work unless value is set
                       value={field.value ? field.value : undefined}
                       onValueChange={field.onChange}
+                      name={field.name}
                     >
                       <SelectTrigger className="truncate">
                         <SelectValue
@@ -171,6 +200,10 @@ const ClipSubmitPage = ({
                         ))}
                       </SelectContent>
                     </Select>
+                    <ErrorText
+                      className="text-sm md:text-lg"
+                      inputName="fakeRank"
+                    />
                   </Label>
                 );
               }}
@@ -182,12 +215,18 @@ const ClipSubmitPage = ({
                 const disabled = !gameId?.length;
                 return (
                   <Label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
-                    Real rank
+                    <span className="flex items-center gap-2">
+                      Real Rank
+                      <span title="Not shown to others until they vote">
+                        <EyeOff className="w-[1rem] text-neutral-500" />
+                      </span>
+                    </span>
                     <Select
                       disabled={disabled}
                       //Placeholder doesnt work unless value is set
                       value={field.value ? field.value : undefined}
                       onValueChange={field.onChange}
+                      name={field.name}
                     >
                       <SelectTrigger className="truncate">
                         <SelectValue
@@ -200,12 +239,20 @@ const ClipSubmitPage = ({
                       </SelectTrigger>
                       <SelectContent>
                         {gameRanks.map((gameRank) => (
-                          <SelectItem value={gameRank.name} key={gameRank.name}>
+                          <SelectItem
+                            value={gameRank.name}
+                            key={gameRank.name}
+                            disabled={gameRank.name === fakeRank}
+                          >
                             {gameRank.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <ErrorText
+                      className="text-sm md:text-lg"
+                      inputName="realRank"
+                    />
                   </Label>
                 );
               }}
@@ -214,6 +261,7 @@ const ClipSubmitPage = ({
             <Label className="flex flex-col items-baseline gap-1 font-light md:gap-2">
               Youtube link of your clip
               <Input className="w-full max-w-3xl" {...form.register("ytUrl")} />
+              <ErrorText className="text-sm md:text-lg" inputName="ytUrl" />
             </Label>
 
             <Button

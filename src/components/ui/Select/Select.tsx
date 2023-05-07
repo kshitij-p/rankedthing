@@ -3,9 +3,11 @@ import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { ChevronDown } from "lucide-react";
 import React, { createContext, useContext, useState } from "react";
 import { cn } from "~/lib/utils";
+import { useFormContext } from "react-hook-form";
 
 type SelectContext = {
   open: boolean;
+  name: string | undefined;
 };
 
 const SelectContext = createContext({ open: false } as SelectContext);
@@ -14,6 +16,7 @@ const Select = ({
   children,
   open: passedOpen,
   onOpenChange: passedOpenChange,
+  name,
   ...rest
 }: React.ComponentPropsWithoutRef<typeof RadixSelect.Root>) => {
   const [_open, _setOpen] = useState(false);
@@ -24,7 +27,7 @@ const Select = ({
 
   return (
     <RadixSelect.Root {...rest} open={open} onOpenChange={onOpenChange}>
-      <SelectContext.Provider value={{ open }}>
+      <SelectContext.Provider value={{ open, name }}>
         {children}
       </SelectContext.Provider>
     </RadixSelect.Root>
@@ -36,21 +39,32 @@ const SelectValue = RadixSelect.Value;
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof RadixSelect.Trigger>,
   React.ComponentPropsWithoutRef<typeof RadixSelect.Trigger>
->(({ className, children, ...props }, ref) => (
-  <RadixSelect.Trigger
-    className={cn(
-      "group flex items-center justify-center gap-2 rounded-md border-2 border-teal-600 bg-transparent py-1 pl-3 pr-2 transition focus:outline-0 focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 radix-disabled:opacity-50",
-      className
-    )}
-    {...props}
-    ref={ref}
-  >
-    {children}
-    <RadixSelect.Icon asChild>
-      <ChevronDown className="ml-auto h-4 w-4 rotate-0 opacity-50 transition group-radix-state-open:rotate-180" />
-    </RadixSelect.Icon>
-  </RadixSelect.Trigger>
-));
+>(({ className, children, ...props }, ref) => {
+  const { name } = useContext(SelectContext);
+  const form = useFormContext();
+
+  const errorMsg =
+    name && form
+      ? form.getFieldState(name, form.formState)?.error?.message
+      : undefined;
+
+  return (
+    <RadixSelect.Trigger
+      aria-invalid={errorMsg !== undefined}
+      className={cn(
+        "group flex items-center justify-center gap-2 rounded-md border-2 border-teal-600 bg-transparent py-1 pl-3 pr-2 transition focus:outline-0 focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900 aria-[invalid=true]:border-red-300 aria-[invalid=true]:hover:border-red-400 aria-[invalid=true]:focus-visible:ring-red-400 radix-disabled:opacity-50",
+        className
+      )}
+      {...props}
+      ref={ref}
+    >
+      {children}
+      <RadixSelect.Icon asChild>
+        <ChevronDown className="ml-auto h-4 w-4 rotate-0 opacity-50 transition group-radix-state-open:rotate-180" />
+      </RadixSelect.Icon>
+    </RadixSelect.Trigger>
+  );
+});
 SelectTrigger.displayName = RadixSelect.Trigger.displayName;
 
 const SelectContent = React.forwardRef<
@@ -115,7 +129,7 @@ const SelectItem = React.forwardRef<
   <RadixSelect.Item
     {...props}
     className={cn(
-      "radix-state-checked:hover-visible:border-teal-300 my-2 flex items-center rounded border border-transparent p-1 pl-2 transition duration-75 hover:border-teal-500 focus:outline-0 focus-visible:border-teal-300 radix-disabled:opacity-50 radix-state-checked:border-teal-500 radix-state-checked:bg-teal-900/50 radix-state-checked:hover:bg-teal-900/90 radix-state-checked:focus-visible:border-teal-300 radix-state-checked:focus-visible:bg-teal-900/90",
+      "radix-state-checked:hover-visible:border-teal-300 my-2 flex items-center rounded border border-transparent p-1 pl-2 transition duration-75 hover:border-teal-500 focus:outline-0 focus-visible:border-teal-300 radix-disabled:pointer-events-none radix-disabled:opacity-50 radix-state-checked:border-teal-500 radix-state-checked:bg-teal-900/50 radix-state-checked:hover:bg-teal-900/90 radix-state-checked:focus-visible:border-teal-300 radix-state-checked:focus-visible:bg-teal-900/90",
       className
     )}
     ref={ref}

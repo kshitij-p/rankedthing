@@ -13,6 +13,8 @@ import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { api, type RouterOutputs } from "~/utils/api";
 import { TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
+import AuthButton from "~/components/util/AuthButton";
+import { useSession } from "next-auth/react";
 
 export const getStaticProps: GetStaticProps<{
   games: RouterOutputs["game"]["getAll"];
@@ -33,12 +35,13 @@ export const getStaticProps: GetStaticProps<{
 };
 
 const GetClipSchema = z.object({
-  gameId: z.string().min(1),
+  gameId: z.string({ required_error: "Choose a game" }).min(1),
 });
 
 const ClipsIndexPage = ({
   games,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const { data } = useSession();
   const router = useRouter();
 
   const form = useForm({
@@ -61,7 +64,7 @@ const ClipsIndexPage = ({
   } = api.game.getUnvotedClip.useQuery(
     { gameId },
     {
-      enabled: queryEnabled,
+      enabled: queryEnabled && data !== null,
       initialData: null,
       initialDataUpdatedAt: 0,
       staleTime: TIME_IN_MS.FIVE_MINUTES,
@@ -110,10 +113,11 @@ const ClipsIndexPage = ({
             name={"gameId"}
             rules={{ required: true }}
             control={form.control}
-            render={({ field }) => {
+            render={({ field, fieldState }) => {
               return (
                 <GameGridSelect
                   {...field}
+                  error={fieldState.error}
                   value={field.value}
                   onChange={(gameId) => {
                     field.onChange(gameId);
@@ -137,7 +141,12 @@ const ClipsIndexPage = ({
             </b>
           ) : null}
 
-          <div className="mt-3 flex flex-col items-center gap-2 md:gap-4">
+          <div className="relative mt-3 flex flex-col items-center gap-2 md:gap-4">
+            {!data && (
+              <div className="absolute inset-0 isolate z-[1] flex h-[105%] w-[105%] items-center justify-center bg-slate-900/10 backdrop-blur-[2px]">
+                <AuthButton variants={{ type: "primary", size: "md" }} />
+              </div>
+            )}
             <Button
               className="mt-4 max-w-max text-base md:mt-8 md:px-6 md:py-8 md:text-3xl "
               type="submit"
@@ -147,7 +156,11 @@ const ClipsIndexPage = ({
               Get a clip
             </Button>
             <strong className="text-xs italic md:text-base">or</strong>
-            <Link className="text-sm md:text-lg" href={"/clips/submit"}>
+            <Link
+              disabled={!data}
+              className="text-sm md:text-lg"
+              href={"/clips/submit"}
+            >
               Post your own clip
             </Link>
           </div>

@@ -12,7 +12,7 @@ const Navbar = () => {
 
   const drawerLinks = [
     { children: "Clips", href: "/clips" },
-    { children: "Profile", href: "/me" },
+    { children: "Profile", href: "/me", disabled: !data },
     /* To do make the aobut page */
   ];
 
@@ -65,7 +65,7 @@ const Navbar = () => {
           {drawerLinks.map((link, index) => {
             return (
               <li className="hidden md:block" key={index}>
-                <Link className="" href={link.href}>
+                <Link className="" href={link.href} disabled={link.disabled}>
                   {link.children}
                 </Link>
               </li>
@@ -89,7 +89,12 @@ const Navbar = () => {
               <div className="flex flex-col gap-8 p-2 text-2xl">
                 {drawerLinks.map((link, index) => {
                   return (
-                    <Link className="" key={index} href={link.href}>
+                    <Link
+                      className=""
+                      key={index}
+                      href={link.href}
+                      disabled={link.disabled}
+                    >
                       {link.children}
                     </Link>
                   );

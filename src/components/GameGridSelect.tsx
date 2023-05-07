@@ -2,6 +2,7 @@ import { type Game } from "@prisma/client";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import Image from "next/image";
 import React, { type ForwardedRef } from "react";
+import { type FieldError } from "react-hook-form";
 import { cn } from "~/lib/utils";
 import NoiseFilter from "./util/NoiseFilter";
 
@@ -11,10 +12,12 @@ const GameGridSelect = React.forwardRef(
       games,
       value,
       onChange,
+      error,
     }: {
       games: Game[];
       value: string;
       onChange: (gameId: string) => void;
+      error?: FieldError;
     },
     passedRef: ForwardedRef<HTMLDivElement>
   ) => {
@@ -55,10 +58,13 @@ const GameGridSelect = React.forwardRef(
       );
     };
 
+    const errorMsg = error?.message;
+
     return (
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center justify-center gap-2">
         <RadioGroup.Root
           className="grid max-w-max grid-cols-3 gap-3 gap-y-4 md:gap-4 md:gap-y-6 lg:grid-cols-4 lg:place-items-center [&>*]:shrink-0"
+          aria-invalid={errorMsg !== undefined}
           value={value}
           onValueChange={onChange}
           ref={passedRef}
@@ -79,6 +85,11 @@ const GameGridSelect = React.forwardRef(
             comingSoon: true,
           })}
         </RadioGroup.Root>
+        {errorMsg && (
+          <b className="self-start text-lg font-semibold text-red-500 md:text-2xl">
+            {errorMsg}
+          </b>
+        )}
       </div>
     );
   }
