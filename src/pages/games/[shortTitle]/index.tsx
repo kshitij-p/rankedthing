@@ -17,6 +17,7 @@ import Image from "next/image";
 import Button from "~/components/ui/Button";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { ErrorTextPrimitive } from "~/components/ui/ErrorText/ErrorText";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const caller = createServerSideHelpers({
@@ -171,6 +172,9 @@ const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
                 <AuthButton variants={{ type: "primary", size: "md" }} />
               </div>
             )}
+            <ErrorTextPrimitive className="text-sm text-red-500 md:text-xl xl:text-3xl">
+              {noMoreClips && "No more clips available"}
+            </ErrorTextPrimitive>
             <Button
               disabled={noMoreClips}
               className="mt-4 max-w-max text-xl md:mt-8 md:px-6 md:py-8 md:text-3xl "

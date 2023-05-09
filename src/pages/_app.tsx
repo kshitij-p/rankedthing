@@ -9,6 +9,7 @@ import "~/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import Layout from "~/components/ui/Layout";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { domAnimation, LazyMotion } from "framer-motion";
 
 const montserrat = Montserrat({
   variable: "--font-inter",
@@ -29,9 +30,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
               font-family: ${montserrat.style.fontFamily};
             }
           `}</style>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <LazyMotion features={domAnimation} strict>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </LazyMotion>
         </>
       </ThemeProvider>
     </SessionProvider>

@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { type ForwardedRef } from "react";
 import { type FieldError } from "react-hook-form";
 import { cn } from "~/lib/utils";
+import { ErrorTextPrimitive } from "./ui/ErrorText/ErrorText";
 import NoiseFilter from "./util/NoiseFilter";
 
 const GameGridSelect = React.forwardRef(
@@ -30,12 +31,12 @@ const GameGridSelect = React.forwardRef(
         <RadioGroup.RadioGroupItem
           disabled={game.comingSoon}
           className={
-            "group relative aspect-[2/3] w-24 rounded-lg p-2 shadow shadow-black/50 focus:outline-0 max-[370px]:w-20 md:w-[10.5rem] md:rounded-xl md:p-4 xl:w-60"
+            "group relative aspect-[2/3] w-24 rounded-lg p-2 shadow shadow-black/50 transition focus:outline-0 max-[370px]:w-20 md:w-[10.5rem] md:rounded-xl md:p-4 xl:w-60"
           }
           value={`${game.id}`}
           key={game.id}
         >
-          <RadioGroup.RadioGroupIndicator className="after:z-1 absolute inset-0 z-[1] flex aspect-square h-full w-full flex-col items-center justify-center gap-1 rounded-[inherit] bg-teal-600/50 backdrop-blur-[2px] after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-radial after:from-transparent after:to-black/50 after:content-['']">
+          <RadioGroup.RadioGroupIndicator className="after:z-1 absolute inset-0 z-[1] flex aspect-square h-full w-full flex-col items-center justify-center gap-1 rounded-[inherit] bg-teal-600/50 backdrop-blur-[2px] transition after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-radial after:from-transparent after:to-black/50 after:content-['']">
             <NoiseFilter className="rounded-[inherit] opacity-[0.15] mix-blend-overlay" />
             <b className="max-h-full max-w-full overflow-x-hidden text-ellipsis text-xs md:text-2xl">
               {game.title}
@@ -85,11 +86,9 @@ const GameGridSelect = React.forwardRef(
             comingSoon: true,
           })}
         </RadioGroup.Root>
-        {errorMsg && (
-          <b className="self-start text-lg font-semibold text-red-500 md:text-2xl">
-            {errorMsg}
-          </b>
-        )}
+        <ErrorTextPrimitive className="self-start text-lg font-semibold text-red-500 md:text-2xl">
+          {errorMsg}
+        </ErrorTextPrimitive>
       </div>
     );
   }

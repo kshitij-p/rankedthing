@@ -41,7 +41,7 @@
   }
 
   .underline-teal-anim:hover::after,
-  .underline-teal-anim:focus::after {
+  .underline-teal-anim:focus-visible::after {
     transform: scaleX(1);
     transform-origin: bottom left;
   }

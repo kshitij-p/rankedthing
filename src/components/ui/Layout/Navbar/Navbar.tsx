@@ -4,6 +4,11 @@ import Link from "../../Link";
 import { useEffect, useRef } from "react";
 import NoiseFilter from "~/components/util/NoiseFilter";
 import Drawer from "../../Drawer";
+import { m } from "framer-motion";
+import {
+  defaultAnimationTransition,
+  getAnimationVariant,
+} from "~/utils/animationHelpers";
 
 const Navbar = () => {
   const { data } = useSession();
@@ -13,7 +18,6 @@ const Navbar = () => {
   const drawerLinks = [
     { children: "Clips", href: "/clips" },
     { children: "Profile", href: "/me", disabled: !data },
-    /* To do make the aobut page */
   ];
 
   const handleAuth = () => (data ? void signOut() : void signIn("google"));
@@ -51,7 +55,13 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="sticky inset-0 z-[1300] bg-slate-900/10 backdrop-blur-sm">
+    <m.header
+      className="sticky inset-0 z-[1300] bg-slate-900/10 backdrop-blur-sm"
+      variants={getAnimationVariant({ type: "fade" })}
+      initial={"hidden"}
+      animate={"visible"}
+      transition={defaultAnimationTransition}
+    >
       <NoiseFilter
         className="will-change-opacity opacity-25 mix-blend-soft-light transition-opacity data-[scroll='0']:opacity-0"
         data-scroll={"0"}
@@ -78,7 +88,7 @@ const Navbar = () => {
               onClick={handleAuth}
             >
               <span className="md:hidden">{data ? <LogOut /> : <LogIn />}</span>
-              <span className="hidden group-focus:text-teal-200 md:inline">
+              <span className="hidden group-focus-visible:text-teal-200 md:inline">
                 {data ? "Sign out" : "Sign in"}
               </span>
             </button>
@@ -104,7 +114,7 @@ const Navbar = () => {
           </li>
         </ul>
       </nav>
-    </header>
+    </m.header>
   );
 };
 

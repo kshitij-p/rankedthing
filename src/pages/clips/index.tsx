@@ -15,6 +15,7 @@ import { api, type RouterOutputs } from "~/utils/api";
 import { TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
 import AuthButton from "~/components/util/AuthButton";
 import { useSession } from "next-auth/react";
+import { ErrorTextPrimitive } from "~/components/ui/ErrorText/ErrorText";
 
 export const getStaticProps: GetStaticProps<{
   games: RouterOutputs["game"]["getAll"];
@@ -135,11 +136,9 @@ const ClipsIndexPage = ({
               );
             }}
           />
-          {noMoreClipsAvailableErr ? (
-            <b className="text-sm text-red-500 md:text-xl xl:text-3xl">
-              {noMoreClipsAvailableErr.message}
-            </b>
-          ) : null}
+          <ErrorTextPrimitive className="text-sm md:text-xl xl:text-3xl">
+            {noMoreClipsAvailableErr ? noMoreClipsAvailableErr.message : null}
+          </ErrorTextPrimitive>
 
           <div className="relative mt-3 flex flex-col items-center gap-2 md:gap-4">
             {!data && (

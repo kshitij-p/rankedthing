@@ -1,6 +1,48 @@
 import React, { type ForwardedRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { cn } from "~/lib/utils";
+import { type HTMLMotionProps, m, AnimatePresence } from "framer-motion";
+import {
+  defaultAnimationTransition,
+  getAnimationVariant,
+} from "~/utils/animationHelpers";
+
+export const ErrorTextPrimitive = React.forwardRef(
+  (
+    {
+      children,
+      className,
+      variants = getAnimationVariant({ type: "fade" }),
+      transition = defaultAnimationTransition,
+      initial = "hidden",
+      animate = "visible",
+      exit = "hidden",
+      ...rest
+    }: HTMLMotionProps<"p">,
+    passedRef: ForwardedRef<HTMLParagraphElement>
+  ) => {
+    return (
+      <AnimatePresence>
+        {children && (
+          <m.p
+            {...rest}
+            variants={variants}
+            initial={initial}
+            animate={animate}
+            exit={exit}
+            transition={transition}
+            className={cn("font-semibold text-red-500", className)}
+            ref={passedRef}
+          >
+            {children}
+          </m.p>
+        )}
+      </AnimatePresence>
+    );
+  }
+);
+
+ErrorTextPrimitive.displayName = "ErrorTextPrimitive";
 
 const ErrorText = React.forwardRef(
   (
@@ -9,7 +51,7 @@ const ErrorText = React.forwardRef(
       inputName,
       className,
       ...rest
-    }: React.ComponentProps<"p"> & {
+    }: HTMLMotionProps<"p"> & {
       inputName: string;
     },
     passedRef: ForwardedRef<HTMLParagraphElement>
@@ -22,14 +64,13 @@ const ErrorText = React.forwardRef(
         : undefined;
 
     return (
-      <p
+      <ErrorTextPrimitive
         {...rest}
         className={cn("font-semibold text-red-500", className)}
         ref={passedRef}
       >
-        {errorMsg}
-        {children}
-      </p>
+        {children ? children : errorMsg}
+      </ErrorTextPrimitive>
     );
   }
 );
