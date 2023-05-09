@@ -2,7 +2,7 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import { type InferGetStaticPropsType, type GetStaticProps } from "next";
 import Link from "~/components/ui/Link";
 import { useRouter } from "next/router";
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { Controller } from "react-hook-form";
 import { z } from "zod";
 import GameGridSelect from "~/components/GameGridSelect";
@@ -12,7 +12,7 @@ import useForm from "~/hooks/useForm";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { api, type RouterOutputs } from "~/utils/api";
-import { TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
+import { TIME_IN_SECS } from "~/utils/client";
 import AuthButton from "~/components/util/AuthButton";
 import { useSession } from "next-auth/react";
 import { ErrorTextPrimitive } from "~/components/ui/ErrorText/ErrorText";
@@ -42,7 +42,7 @@ const GetClipSchema = z.object({
 const ClipsIndexPage = ({
   games,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { data, status } = useSession();
+  const { data } = useSession();
   const router = useRouter();
 
   const form = useForm({
@@ -54,50 +54,29 @@ const ClipsIndexPage = ({
 
   const gameId = parseInt(form.watch("gameId"));
 
-  const [queryEnabled, setQueryEnabled] = useState(false);
-
   const noClipsForGamesRef = useRef<Set<number>>(new Set());
 
-  const {
-    isLoading,
-    isFetching,
-    data: videoClip,
-  } = api.game.getUnvotedClip.useQuery(
+  const { isLoading, isFetching, refetch } = api.game.getUnvotedClip.useQuery(
     { gameId },
     {
-      enabled: queryEnabled && status === "authenticated",
+      enabled: false,
       initialData: null,
       initialDataUpdatedAt: 0,
-      staleTime: TIME_IN_MS.FIVE_MINUTES,
-      onSettled: (clip, err) => {
-        setQueryEnabled(false);
-        if (err) {
-          return;
-        }
-
-        if (clip) {
-          void router.push(`/clips/${clip.id}`);
-        } else {
-          form.setError("root", {
-            type: "404",
-            message: "No more clips available for this game",
-          });
-          noClipsForGamesRef.current.add(gameId);
-        }
-      },
+      staleTime: Infinity,
     }
   );
 
-  const handleGet = () => {
-    //Handle cached resp
-    if (noMoreClipsAvailableErr) {
-      return;
-    }
+  const handleGet = async () => {
+    const { data: videoClip } = await refetch({ stale: false });
     if (videoClip) {
       void router.push(`/clips/${videoClip.id}`);
-      return;
+    } else {
+      form.setError("root", {
+        type: "404",
+        message: "No more clips available for this game",
+      });
+      noClipsForGamesRef.current.add(gameId);
     }
-    setQueryEnabled(true);
   };
 
   return (

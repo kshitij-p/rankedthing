@@ -1,4 +1,5 @@
 import { createServerSideHelpers } from "@trpc/react-query/server";
+import { AnimatePresence, m } from "framer-motion";
 import {
   type InferGetStaticPropsType,
   type GetStaticProps,
@@ -21,6 +22,10 @@ import PageWithFallback from "~/components/util/PageWithFallback";
 import { cn } from "~/lib/utils";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
+import {
+  defaultAnimationTransition,
+  getAnimationVariant,
+} from "~/utils/animationHelpers";
 import { api, type RouterInputs, type RouterOutputs } from "~/utils/api";
 import { getFromParam, TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
 
@@ -122,6 +127,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
         void utils.clipVote.getVoteForClip.invalidate({ clipId: clip.id });
 
         void utils.game.getUnvotedClip.invalidate({ gameId: clip.gameId });
+
         void utils.game.getAllUnvotedClips.invalidate();
 
         void utils.stats.invalidate();
@@ -143,39 +149,51 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
   return (
     <div className="mt-2 flex w-full flex-col items-center gap-3 md:mt-4 md:gap-6">
       <p className="self-center">{"Player's real rank is"}</p>
-
       <div
         className={cn(
           "relative z-[1] flex items-start justify-center",
           existingVote && "min-h-[5rem] md:min-h-[6rem]"
         )}
       >
-        {votingDisabled && (
-          <div className="item-center absolute inset-0 z-10 flex h-full w-full justify-center bg-neutral-1000/60 backdrop-blur-[2px]">
-            <div className="inline-flex items-center justify-center text-center text-lg font-bold text-slate-300 md:text-2xl">
-              {status === "unauthenticated" ? (
-                <AuthButton variants={{ type: "primary" }} />
-              ) : existingVote ? (
-                <div className="flex flex-col items-center font-normal">
-                  <RankImage
-                    className="w-16 md:w-24"
-                    game={clip.game}
-                    rankName={clip.realRankName}
-                  />
-                  <p>{`Your score: ${existingVote.score}`}</p>
-                  <p>{`You guessed ${
-                    existingVote.guessedHigher ? "higher" : "lower"
-                  }`}</p>
-                </div>
-              ) : clipOwnedByUser ? (
-                "Can't vote on your own clip!"
-              ) : (
-                //To do add a spinner here
-                "Loading..."
-              )}
+        <AnimatePresence>
+          {votingDisabled && (
+            <div className="item-center absolute inset-0 z-10 flex h-full w-full justify-center bg-neutral-1000/60 backdrop-blur-[2px]">
+              <div className="inline-flex items-center justify-center text-center text-lg font-bold text-slate-300 md:text-2xl">
+                <AnimatePresence>
+                  {status === "unauthenticated" ? (
+                    <AuthButton variants={{ type: "primary" }} />
+                  ) : existingVote ? (
+                    <m.div
+                      className="flex flex-col items-center font-normal"
+                      variants={getAnimationVariant({ type: "zoom" })}
+                      initial={"hidden"}
+                      animate={"visible"}
+                      exit={"hidden"}
+                      transition={defaultAnimationTransition}
+                    >
+                      <m.div>
+                        <RankImage
+                          className="w-16 md:w-24"
+                          game={clip.game}
+                          rankName={clip.realRankName}
+                        />
+                      </m.div>
+                      <p>{`Your score: ${existingVote.score}`}</p>
+                      <p>{`You guessed ${
+                        existingVote.guessedHigher ? "higher" : "lower"
+                      }`}</p>
+                    </m.div>
+                  ) : clipOwnedByUser ? (
+                    "Can't vote on your own clip!"
+                  ) : (
+                    //To do add a spinner here
+                    "Loading..."
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </AnimatePresence>
 
         <fieldset disabled={votingDisabled}>
           <div className={"flex items-center justify-center gap-6 md:gap-14"}>

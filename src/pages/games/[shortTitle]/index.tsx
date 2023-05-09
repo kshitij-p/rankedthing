@@ -64,7 +64,6 @@ const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
 
   const isLoggedIn = status === "authenticated";
 
-  const [queryEnabled, setQueryEnabled] = useState(false);
   const [noMoreClips, setNoMoreClips] = useState(false);
 
   const { data: totalClips } = api.stats.getClipsCountForGame.useQuery(
@@ -82,27 +81,15 @@ const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
     }
   );
 
-  const { data: randomClip } = api.game.getUnvotedClip.useQuery(
+  const { refetch } = api.game.getUnvotedClip.useQuery(
     {
       gameId: game.id,
     },
     {
-      enabled: queryEnabled && isLoggedIn && !noMoreClips,
+      enabled: false,
       initialData: null,
       initialDataUpdatedAt: 0,
-      staleTime: TIME_IN_MS.FIVE_MINUTES,
-      onSettled: (clip, err) => {
-        setQueryEnabled(false);
-        if (err) {
-          return;
-        }
-
-        if (clip) {
-          void router.push(`/clips/${clip.id}`);
-        } else {
-          setNoMoreClips(true);
-        }
-      },
+      staleTime: Infinity,
     }
   );
 
@@ -128,12 +115,14 @@ const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
   ];
 
   const handleGetClip = () => {
-    if (randomClip) {
-      void router.push(`/clips/${randomClip.id}`);
-      return;
-    }
-
-    setQueryEnabled(true);
+    void (async function () {
+      const { data: videoClip } = await refetch({ stale: false, });
+      if (videoClip) {
+        void router.push(`/clips/${videoClip.id}`);
+      } else {
+        setNoMoreClips(true);
+      }
+    })();
   };
 
   return (

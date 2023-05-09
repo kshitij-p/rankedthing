@@ -1,7 +1,7 @@
 import { type Transition, type Variants } from "framer-motion";
 
 const animSettings = {
-  startScale: "0%",
+  startScale: "75%",
   endScale: "100%",
   autoAlpha: {
     visible: {
