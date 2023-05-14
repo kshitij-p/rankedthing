@@ -69,7 +69,7 @@ const Navbar = () => {
       />
       <nav className="flex items-center justify-between px-8 py-4 text-lg md:justify-evenly md:text-xl [&>*]:shrink-0">
         <Link className="text-2xl" href={"/"}>
-          <b>RankedThing</b>
+          <b>Wrongdle</b>
         </Link>
         <ul className="flex items-center gap-4 md:gap-16">
           {drawerLinks.map((link, index) => {

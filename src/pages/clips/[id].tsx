@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from "~/components/ui/Dialog";
 import { DialogClose, DialogFooter } from "~/components/ui/Dialog/Dialog";
+import Loader from "~/components/ui/Loader";
 import AuthButton from "~/components/util/AuthButton";
 import PageWithFallback from "~/components/util/PageWithFallback";
 import { cn } from "~/lib/utils";
@@ -186,8 +187,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
                   ) : clipOwnedByUser ? (
                     "Can't vote on your own clip!"
                   ) : (
-                    //To do add a spinner here
-                    "Loading..."
+                    <Loader variant="default" />
                   )}
                 </AnimatePresence>
               </div>

@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
+import PageSpinner from "../ui/Loader/PageSpinner";
 
 //This is HOC whose props we will never use in this component so any here is fine.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,8 +12,7 @@ const ProtectedPage = (Page: NextPage<any>) => {
     const router = useRouter();
 
     if (status === "loading" || !router.isReady) {
-      //To do add a spinner here
-      return "Loading";
+      return <PageSpinner />;
     }
 
     if (status === "unauthenticated") {
