@@ -9,9 +9,10 @@ import {
 } from "../../trpc";
 import { GAME_ID_SCHEMA } from "../gameRouter/gameRouter";
 
-const isValidRank = async (name: string, prisma: PrismaClient) => {
-  const rank = await prisma.gameRank.findUnique({ where: { name } });
-  return rank?.name === name;
+const isValidRank = async (id: string, prisma: PrismaClient) => {
+  const rank = await prisma.gameRank.findUnique({ where: { id } });
+
+  return rank?.id === id;
 };
 
 export const FakeRankDoesntExistError = new TRPCError({
@@ -44,6 +45,8 @@ const videoClipRouter = createTRPCRouter({
         },
         include: {
           game: true,
+          fakeRank: true,
+          realRank: true,
         },
       });
 
@@ -93,8 +96,8 @@ const videoClipRouter = createTRPCRouter({
             gameId,
             title,
             ytUrl,
-            fakeRankName: fakeRank,
-            realRankName: realRank,
+            fakeRankId: fakeRank,
+            realRankId: realRank,
           },
         });
 
@@ -160,8 +163,8 @@ const videoClipRouter = createTRPCRouter({
             id: toUpdate.id,
           },
           data: {
-            fakeRankName: newFakeRank,
-            realRankName: newRealRank,
+            fakeRankId: newFakeRank,
+            realRankId: newRealRank,
             title: newTitle,
             ytUrl: newYtUrl,
           },

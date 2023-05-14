@@ -176,7 +176,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
                         <RankImage
                           className="w-16 md:w-24"
                           game={clip.game}
-                          rankName={clip.realRankName}
+                          rankName={clip.realRank.name}
                         />
                       </m.div>
                       <p>{`Your score: ${existingVote.score}`}</p>
@@ -185,7 +185,7 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
                       }`}</p>
                     </m.div>
                   ) : clipOwnedByUser ? (
-                    "Can't vote on your own clip!"
+                    <div>{"Can't vote on your own clip!"}</div>
                   ) : (
                     <Loader variant="default" />
                   )}
@@ -249,10 +249,10 @@ const GameClipPage = ({
           <RankImage
             className="w-28 md:w-44"
             game={clip.game}
-            rankName={clip.fakeRankName}
+            rankName={clip.fakeRank.name}
           />
           <p className="text-xl text-slate-300 md:text-3xl">
-            {clip.fakeRankName}
+            {clip.fakeRank.name}
           </p>
         </div>
         <VotingArea clip={clip} />

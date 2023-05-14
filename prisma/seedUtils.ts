@@ -20,6 +20,24 @@ export const SUPPORTED_GAMES: Array<Prisma.GameCreateInput> = [
       },
     },
   },
+  {
+    title: "Apex Legends",
+    shortTitle: "apex",
+    ranks: {
+      createMany: {
+        data: [
+          { name: "Rookie", minElo: 1, maxElo: 4 },
+          { name: "Bronze", minElo: 5, maxElo: 9 },
+          { name: "Silver", minElo: 10, maxElo: 14 },
+          { name: "Gold", minElo: 15, maxElo: 19 },
+          { name: "Platinum", minElo: 20, maxElo: 24 },
+          { name: "Diamond", minElo: 25, maxElo: 29 },
+          { name: "Master", minElo: 30, maxElo: 30 },
+          { name: "Predator", minElo: 31, maxElo: 31 },
+        ],
+      },
+    },
+  },
 ];
 
 export const validateSupportedGames = () => {
@@ -56,6 +74,7 @@ export const validateSupportedGames = () => {
         }
       }
     );
+    console.log(`✔️  Ok - ${game.shortTitle}`);
   }
   return isValid;
 };

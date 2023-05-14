@@ -38,6 +38,8 @@ const statsRouter = createTRPCRouter({
           clip: {
             include: {
               game: true,
+              fakeRank: true,
+              realRank: true,
             },
           },
         },

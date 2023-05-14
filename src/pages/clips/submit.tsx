@@ -113,7 +113,7 @@ const ClipSubmitPage = ({
 
   //When fake rank changes, update real rank to something else if they are the same
   useEffect(() => {
-    const fakeRankIdx = gameRanks?.findIndex((rank) => rank.name === fakeRank);
+    const fakeRankIdx = gameRanks?.findIndex((rank) => rank.id === fakeRank);
 
     if (fakeRankIdx < 0) {
       return;
@@ -123,7 +123,7 @@ const ClipSubmitPage = ({
       form.setValue(
         "realRank",
         gameRanks[fakeRankIdx + 1 >= gameRanks.length ? 0 : fakeRankIdx + 1]
-          ?.name ?? ""
+          ?.id ?? ""
       );
     }
   }, [fakeRank, realRank, form, gameRanks]);
@@ -133,8 +133,8 @@ const ClipSubmitPage = ({
     if (!gameRanks) {
       return;
     }
-    form.setValue("fakeRank", gameRanks[0]?.name ?? "");
-    form.setValue("realRank", gameRanks[1]?.name ?? "");
+    form.setValue("fakeRank", gameRanks[0]?.id ?? "");
+    form.setValue("realRank", gameRanks[1]?.id ?? "");
     if (gameRanks[0]) {
       form.clearErrors("fakeRank");
     }
@@ -206,7 +206,7 @@ const ClipSubmitPage = ({
                       </SelectTrigger>
                       <SelectContent>
                         {gameRanks.map((gameRank) => (
-                          <SelectItem value={gameRank.name} key={gameRank.name}>
+                          <SelectItem value={gameRank.id} key={gameRank.id}>
                             {gameRank.name}
                           </SelectItem>
                         ))}
@@ -252,9 +252,9 @@ const ClipSubmitPage = ({
                       <SelectContent>
                         {gameRanks.map((gameRank) => (
                           <SelectItem
-                            value={gameRank.name}
-                            key={gameRank.name}
-                            disabled={gameRank.name === fakeRank}
+                            value={gameRank.id}
+                            key={gameRank.id}
+                            disabled={gameRank.id === fakeRank}
                           >
                             {gameRank.name}
                           </SelectItem>

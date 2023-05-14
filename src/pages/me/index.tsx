@@ -21,7 +21,7 @@ const ProfilePage = () => {
               >
                 <RankImage
                   className="w-20 shrink-0 md:w-36"
-                  rankName={vote.clip.fakeRankName}
+                  rankName={vote.clip.fakeRank.name}
                   game={vote.clip.game}
                 />
                 <div>

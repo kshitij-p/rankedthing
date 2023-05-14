@@ -28,12 +28,6 @@ export const getStaticProps: GetStaticProps<{
   > = [
     ...(await caller.game.getAll.fetch()),
     {
-      id: -1,
-      shortTitle: "apex",
-      title: "Apex legends",
-      comingSoon: true,
-    },
-    {
       id: -2,
       shortTitle: "overwatch2",
       title: "Overwatch 2",

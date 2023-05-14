@@ -14,8 +14,8 @@ import {
 const makeMockVideoClip = (clip?: Partial<VideoClip>) => {
   return {
     ...({
-      fakeRankName: "diffRank",
-      realRankName: "diffRank",
+      fakeRankId: "diffRank",
+      realRankId: "diffRank",
       gameId: 1,
       id: "1",
       submittedAt: new Date(),
@@ -32,6 +32,7 @@ const makeMockRank = (rank?: Partial<GameRank>) => {
   return {
     ...({
       name: "rank",
+      id: "1",
       gameId: 1,
       maxElo: 1,
       minElo: 1,
@@ -58,15 +59,15 @@ describe("create", () => {
     });
 
     const mockClip = makeMockVideoClip({
-      fakeRankName: "existentRank",
-      realRankName: "existentRank",
+      fakeRankId: "existentRank",
+      realRankId: "existentRank",
       userId: ctx.session?.user.id,
       ytUrl: "invalidurl",
     });
 
     prismaMock.gameRank.findUnique.mockResolvedValue(
       makeMockRank({
-        name: mockClip.fakeRankName,
+        name: mockClip.fakeRankId,
       })
     );
 
@@ -76,8 +77,8 @@ describe("create", () => {
       caller.videoClip.create({
         ...mockClip,
         gameId: mockClip.gameId,
-        fakeRank: mockClip.fakeRankName,
-        realRank: mockClip.realRankName,
+        fakeRank: mockClip.fakeRankId,
+        realRank: mockClip.realRankId,
         title: mockClip.title,
         ytUrl: mockClip.ytUrl,
       })
@@ -95,14 +96,14 @@ describe("create", () => {
     });
 
     const mockClip = makeMockVideoClip({
-      fakeRankName: "existentRank",
-      realRankName: "existentRank",
+      fakeRankId: "existentRank",
+      realRankId: "existentRank",
       userId: ctx.session?.user.id,
     });
 
     prismaMock.gameRank.findUnique.mockResolvedValue(
       makeMockRank({
-        name: "existentRank",
+        id: "existentRank",
       })
     );
 
@@ -140,8 +141,8 @@ describe("create", () => {
     });
 
     const clipToEdit = makeMockVideoClip({
-      fakeRankName: "existentRank",
-      realRankName: "existentRank",
+      fakeRankId: "existentRank",
+      realRankId: "existentRank",
       userId: ctx.session?.user.id,
     });
 
@@ -149,6 +150,7 @@ describe("create", () => {
 
     prismaMock.gameRank.findUnique.mockResolvedValue({
       gameId: 1,
+      id: "existentRank",
       name: "existentRank",
       maxElo: 1,
       minElo: 1,
@@ -216,6 +218,7 @@ describe("create", () => {
       maxElo: 1,
       minElo: 1,
       name: "sameRank",
+      id: "sameRank",
     });
     prismaMock.videoClip.update.mockResolvedValue(mockClip);
 
