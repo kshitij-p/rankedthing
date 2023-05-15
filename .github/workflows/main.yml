@@ -15,6 +15,12 @@ jobs:
     env:
       DATABASE_URL: "https://www.fakedb.com"
 
+      GOOGLE_CLIENT_ID: "fake client id"
+      GOOGLE_CLIENT_SECRET: "fake client secret"
+
+      NEXTAUTH_SECRET: "fake secret"
+      NEXTAUTH_URL: "fake auth url"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -32,3 +38,6 @@ jobs:
 
       - name: Linting
         run: npm run lint
+
+      - name: Testing
+        run: npm run test
