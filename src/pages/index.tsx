@@ -55,7 +55,7 @@ const Home = ({ games }: InferGetStaticPropsType<typeof getStaticProps>) => {
       <div className="flex flex-col items-center gap-8 bg-dark-teal px-6 py-10 text-slate-200 md:gap-16 md:px-12 md:py-24 xl:py-32">
         <div className="flex flex-col items-center gap-2 md:gap-3">
           <h2 className="text-3xl font-bold text-slate-100 md:text-5xl">
-            Wrongdle
+            KEKW
           </h2>
           <p className="text-center font-light text-neutral-300 md:w-3/4 md:text-xl">
             Guess whether a person is secretly goated or coping about his rank
