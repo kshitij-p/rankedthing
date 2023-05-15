@@ -12,7 +12,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { domAnimation, LazyMotion } from "framer-motion";
 
 const montserrat = Montserrat({
-  variable: "--font-inter",
   subsets: ["latin"],
 });
 
