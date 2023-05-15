@@ -19,7 +19,7 @@ jobs:
       GOOGLE_CLIENT_SECRET: "fake client secret"
 
       NEXTAUTH_SECRET: "fake secret"
-      NEXTAUTH_URL: "fake auth url"
+      NEXTAUTH_URL: "https://www.fake.com"
 
     steps:
       - name: Checkout code
