@@ -18,5 +18,14 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  typescript: {
+    //TS errors will be checked in CI
+    ignoreBuildErrors: true
+  },
+  eslint: {
+    //Eslint errors will be checked in CI
+    ignoreDuringBuilds: true
+  },
+  swcMinify: true
 };
 export default config;

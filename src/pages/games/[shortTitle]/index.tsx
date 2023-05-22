@@ -59,6 +59,7 @@ export const getStaticProps: GetStaticProps<{
 };
 
 const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  console.log(game);
   const { status } = useSession();
   const router = useRouter();
 
@@ -116,7 +117,7 @@ const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
 
   const handleGetClip = () => {
     void (async function () {
-      const { data: videoClip } = await refetch({ stale: false, });
+      const { data: videoClip } = await refetch({ stale: false });
       if (videoClip) {
         void router.push(`/clips/${videoClip.id}`);
       } else {
