@@ -59,7 +59,6 @@ export const getStaticProps: GetStaticProps<{
 };
 
 const GamePage = ({ game }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  console.log(game);
   const { status } = useSession();
   const router = useRouter();
 
