@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { isValidYtUrl } from "~/utils/client";
 import {
+  adminProcedure,
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
@@ -59,7 +60,7 @@ const videoClipRouter = createTRPCRouter({
 
       return clip;
     }),
-  create: protectedProcedure
+  create: adminProcedure
     .input(
       z.object({
         title: z.string(),
@@ -104,6 +105,62 @@ const videoClipRouter = createTRPCRouter({
         return newClip;
       }
     ),
+  createPotentialClip: protectedProcedure
+    .input(
+      z.object({
+        title: z.string(),
+        gameId: GAME_ID_SCHEMA,
+        ytUrl: z.string(),
+        realRank: z.string(),
+        fakeRank: z.string(),
+      })
+    )
+    .mutation(
+      async ({
+        ctx: { prisma, session },
+        input: { realRank, fakeRank, ytUrl, title, gameId },
+      }) => {
+        if (!isValidYtUrl(ytUrl)) {
+          throw InvalidYtUrlError;
+        }
+
+        if (fakeRank === realRank) {
+          throw FakeRankSameAsRealRankError;
+        }
+
+        if (!(await isValidRank(realRank, prisma))) {
+          throw RealRankDoesntExistError;
+        }
+
+        if (!(await isValidRank(fakeRank, prisma))) {
+          throw FakeRankDoesntExistError;
+        }
+
+        const newClip = await prisma.potentialClip.create({
+          data: {
+            userId: session.user.id,
+            gameId,
+            title,
+            ytUrl,
+            fakeRankId: fakeRank,
+            realRankId: realRank,
+          },
+        });
+
+        return newClip;
+      }
+    ),
+  getAllPotentialClips: adminProcedure.query(async ({ ctx: { prisma } }) => {
+    return await prisma.potentialClip.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+  }),
   update: protectedProcedure
     .input(
       z.object({

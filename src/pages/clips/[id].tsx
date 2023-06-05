@@ -6,8 +6,9 @@ import {
   type GetStaticPaths,
 } from "next";
 import { useSession } from "next-auth/react";
-import React, { useMemo } from "react";
+import React from "react";
 import { z } from "zod";
+import ClipPlayer from "~/components/clips/ClipPlayer";
 import RankImage from "~/components/ranks/RankImage";
 import Button from "~/components/ui/Button";
 import {
@@ -29,16 +30,6 @@ import {
 } from "~/utils/animationHelpers";
 import { api, type RouterInputs, type RouterOutputs } from "~/utils/api";
 import { getFromParam, TIME_IN_MS, TIME_IN_SECS } from "~/utils/client";
-
-const getEmbedUrl = (url: string) => {
-  const id = url.split("?v=")?.[1] ?? url.split("shorts/")?.[1];
-
-  if (!id) {
-    return null;
-  }
-
-  return `https://www.youtube-nocookie.com/embed/${id}`;
-};
 
 const HowItWorksDialog = () => {
   return (
@@ -223,25 +214,13 @@ const VotingArea = ({ clip }: { clip: PageClip }) => {
 const GameClipPage = ({
   clip,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const embedUrl = useMemo(() => getEmbedUrl(clip.ytUrl), [clip.ytUrl]);
-
   return (
     <div className="p-6 pt-12 md:p-14 md:pt-28">
       <div className="flex flex-col items-center gap-4 text-2xl text-slate-200 md:gap-6 md:text-4xl">
         <h3 className="text-3xl font-extrabold md:text-5xl">{`Higher or Lower`}</h3>
         <div className="mt-2 flex flex-col items-center gap-1 md:mt-4 md:gap-2">
           <div className="flex aspect-video w-[50rem] max-w-[75vw] items-center justify-center">
-            {embedUrl ? (
-              <iframe
-                className="h-full w-full"
-                allowFullScreen
-                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-                sandbox="allow-popups allow-same-origin allow-scripts allow-presentation"
-                src={getEmbedUrl(clip.ytUrl) ?? ""}
-              />
-            ) : (
-              <b>This link is broken sadge ;-;</b>
-            )}
+            <ClipPlayer clip={clip} />
           </div>
           <HowItWorksDialog />
         </div>

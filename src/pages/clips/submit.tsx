@@ -1,7 +1,6 @@
 import { SelectTrigger, SelectValue, SelectItem } from "~/components/ui/Select";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { type InferGetStaticPropsType, type GetStaticProps } from "next";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import { z } from "zod";
@@ -93,14 +92,15 @@ const ClipSubmitPage = ({
   const fakeRank = form.watch("fakeRank", "");
   const realRank = form.watch("realRank", "");
 
-  const { mutate: createClip, isLoading } = api.videoClip.create.useMutation({
-    onSettled: () => {
-      void utils.stats.getClipsCountForGame.invalidate();
-    },
-    onSuccess: (newClip) => {
-      setNewClipId(newClip.id);
-    },
-  });
+  const { mutate: createClip, isLoading } =
+    api.videoClip.createPotentialClip.useMutation({
+      onSettled: () => {
+        void utils.stats.getClipsCountForGame.invalidate();
+      },
+      onSuccess: (newClip) => {
+        setNewClipId(newClip.id);
+      },
+    });
 
   const handleSubmit = (data: CreateClipFormValues) => {
     if (data.fakeRank === data.realRank) {
@@ -285,9 +285,10 @@ const ClipSubmitPage = ({
             </Button>
 
             {newClipId ? (
-              <Link href={`/clips/${newClipId}`}>
-                Success! Created your clip
-              </Link>
+              <p>
+                Success! Your clip has been submitted. If its approved you will
+                see it soon
+              </p>
             ) : null}
           </div>
         </div>

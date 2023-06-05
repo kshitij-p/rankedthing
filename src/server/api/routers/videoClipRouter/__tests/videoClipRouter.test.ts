@@ -53,6 +53,7 @@ describe("create", () => {
       session: {
         user: {
           id: "test-user-id",
+          role: "USER",
         },
         expires: new Date().toISOString(),
       },
@@ -74,7 +75,7 @@ describe("create", () => {
     const caller = appRouter.createCaller({ ...ctx, prisma: prismaMock });
 
     await expect(
-      caller.videoClip.create({
+      caller.videoClip.createPotentialClip({
         ...mockClip,
         gameId: mockClip.gameId,
         fakeRank: mockClip.fakeRankId,
@@ -90,6 +91,7 @@ describe("create", () => {
       session: {
         user: {
           id: "test-user-id",
+          role: "USER",
         },
         expires: new Date().toISOString(),
       },
@@ -110,7 +112,7 @@ describe("create", () => {
     const caller = appRouter.createCaller({ ...ctx, prisma: prismaMock });
 
     await expect(
-      caller.videoClip.create({
+      caller.videoClip.createPotentialClip({
         gameId: mockClip.gameId,
         fakeRank: "nonExistentRank",
         realRank: "existentRank",
@@ -120,7 +122,7 @@ describe("create", () => {
     ).rejects.toThrowError(FakeRankDoesntExistError);
 
     await expect(
-      caller.videoClip.create({
+      caller.videoClip.createPotentialClip({
         gameId: mockClip.gameId,
         fakeRank: "existentRank",
         realRank: "nonExistentRank",
@@ -135,6 +137,7 @@ describe("create", () => {
       session: {
         user: {
           id: "test-user-id",
+          role: "USER",
         },
         expires: new Date().toISOString(),
       },
@@ -178,6 +181,7 @@ describe("create", () => {
       session: {
         user: {
           id: "test-user-id",
+          role: "USER",
         },
         expires: new Date().toISOString(),
       },
@@ -185,12 +189,12 @@ describe("create", () => {
 
     const mockClip = makeMockVideoClip();
 
-    prismaMock.videoClip.create.mockResolvedValue(mockClip);
+    prismaMock.potentialClip.create.mockResolvedValue(mockClip);
 
     const caller = appRouter.createCaller({ ...ctx, prisma: prismaMock });
 
     await expect(
-      caller.videoClip.create({
+      caller.videoClip.createPotentialClip({
         gameId: mockClip.gameId,
         title: mockClip.title,
         ytUrl: mockClip.ytUrl,
@@ -205,6 +209,7 @@ describe("create", () => {
       session: {
         user: {
           id: "test-user-id",
+          role: "USER",
         },
         expires: new Date().toISOString(),
       },

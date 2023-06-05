@@ -48,16 +48,17 @@ enum UserRole {
 }
 
 model User {
-    id            String      @id @default(cuid())
+    id            String          @id @default(cuid())
     name          String?
-    email         String?     @unique
+    email         String?         @unique
     emailVerified DateTime?
     image         String?
-    role          UserRole    @default(USER)
+    role          UserRole        @default(USER)
     accounts      Account[]
     sessions      Session[]
     VideoClip     VideoClip[]
     ClipVote      ClipVote[]
+    PotentialClip PotentialClip[]
 }
 
 model VerificationToken {
@@ -76,18 +77,21 @@ model GameRank {
     maxElo Int
     gameId Int
 
-    realRankClips VideoClip[] @relation("RealRankClips")
-    fakeRankClips VideoClip[] @relation("FakeRankClips")
+    realRankClips          VideoClip[]     @relation("RealRankClips")
+    fakeRankClips          VideoClip[]     @relation("FakeRankClips")
+    potentialRealRankClips PotentialClip[] @relation("PotentialRealRankClips")
+    potentialFakeRankClips PotentialClip[] @relation("PotentialFakeRankClips")
 
     @@index([gameId])
 }
 
 model Game {
-    id         Int         @id @default(autoincrement())
-    title      String      @unique @db.Char(255)
-    shortTitle String      @unique @db.Char(255)
-    ranks      GameRank[]
-    VideoClip  VideoClip[]
+    id            Int             @id @default(autoincrement())
+    title         String          @unique @db.Char(255)
+    shortTitle    String          @unique @db.Char(255)
+    ranks         GameRank[]
+    VideoClip     VideoClip[]
+    PotentialClip PotentialClip[]
 }
 
 model ClipVote {
@@ -106,6 +110,33 @@ model ClipVote {
 
     @@unique([videoClipId, userId])
     @@index([userId])
+}
+
+model PotentialClip {
+    id    String @id @default(cuid())
+    title String @db.Text
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    gameId Int
+
+    realRank   GameRank @relation("PotentialRealRankClips", fields: [realRankId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    realRankId String   @db.Char(255)
+
+    fakeRank   GameRank @relation("PotentialFakeRankClips", fields: [fakeRankId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    fakeRankId String   @db.Char(255)
+
+    ytUrl String @db.Text
+
+    submittedAt DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@index([userId])
+    @@index([gameId])
+    @@index([realRankId])
+    @@index([fakeRankId])
 }
 
 model VideoClip {
