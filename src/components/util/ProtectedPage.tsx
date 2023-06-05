@@ -21,6 +21,8 @@ const ProtectedPage = (Page: NextPage<any>) => {
           callbackUrl: window.location.href,
         }).toString()}`
       );
+
+      return <PageSpinner />;
     }
 
     return <Page {...props} />;

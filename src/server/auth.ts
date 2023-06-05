@@ -8,6 +8,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
+import { UserRole } from "@prisma/client";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -21,13 +22,13 @@ declare module "next-auth" {
       id: string;
       // ...other properties
       // role: UserRole;
+      role: UserRole;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    role: UserRole;
+  }
 }
 
 /**
@@ -37,13 +38,16 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: ({ session, user }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          role: user.role ?? UserRole.USER,
+          id: user.id,
+        },
+      };
+    },
     // eslint-disable-next-line @typescript-eslint/require-await
     signIn: async ({ account, profile }) => {
       if (!account || !profile) {
