@@ -225,6 +225,33 @@ const videoClipRouter = createTRPCRouter({
             name: true,
           },
         },
+        game: {
+          select: {
+            title: true,
+          },
+        },
+        fakeRank: {
+          select: {
+            Game: {
+              select: {
+                title: true,
+                shortTitle: true,
+              },
+            },
+            name: true,
+          },
+        },
+        realRank: {
+          select: {
+            Game: {
+              select: {
+                title: true,
+                shortTitle: true,
+              },
+            },
+            name: true,
+          },
+        },
       },
     });
   }),

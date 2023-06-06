@@ -1,9 +1,13 @@
-import Link from "next/link";
+import { UserRole } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import RankImage from "~/components/ranks/RankImage";
+import Link from "~/components/ui/Link";
 import ProtectedPage from "~/components/util/ProtectedPage";
 import { api } from "~/utils/api";
 
 const ProfilePage = () => {
+  const { data } = useSession();
+
   const { data: userVotes } = api.stats.getClipsHistory.useQuery(undefined, {
     staleTime: Infinity,
   });
@@ -11,6 +15,11 @@ const ProfilePage = () => {
   return (
     <div className="p-6 md:p-14 xl:px-28 xl:py-20">
       <div className="flex flex-col gap-6 md:gap-12">
+        {data?.user.role === UserRole.ADMIN && (
+          <Link className="w-max" href={"/admin"}>
+            Go to admin panel
+          </Link>
+        )}
         <h2 className="text-3xl font-bold md:text-5xl">Vote History</h2>
         <ul className="flex flex-col gap-5 md:gap-10">
           {userVotes?.map((vote) => {
