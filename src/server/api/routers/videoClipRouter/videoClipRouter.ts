@@ -1,4 +1,4 @@
-import { type PrismaClient } from "@prisma/client";
+import { type PrismaClient, Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { isValidYtUrl } from "~/utils/client";
@@ -150,6 +150,73 @@ const videoClipRouter = createTRPCRouter({
         return newClip;
       }
     ),
+  rejectPotentialClip: adminProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .mutation(async ({ ctx: { prisma }, input: { id } }) => {
+      try {
+        return await prisma.potentialClip.delete({
+          where: {
+            id,
+          },
+        });
+      } catch (e) {
+        //Check if error is record doesn't exist
+        if (
+          e instanceof Prisma.PrismaClientKnownRequestError &&
+          e.code === "P2025"
+        ) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+          });
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    }),
+  acceptPotentialClip: adminProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .mutation(async ({ ctx: { prisma }, input: { id } }) => {
+      const toAccept = await prisma.potentialClip.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!toAccept) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const videoClip = await prisma.videoClip.create({
+        data: {
+          userId: toAccept.userId,
+          title: toAccept.title,
+          ytUrl: toAccept.ytUrl,
+          gameId: toAccept.gameId,
+          fakeRankId: toAccept.fakeRankId,
+          realRankId: toAccept.realRankId,
+          submittedAt: toAccept.submittedAt,
+        },
+      });
+
+      try {
+        await prisma.potentialClip.delete({
+          where: {
+            id: id,
+          },
+        });
+      } catch (e) {
+        //Remove the new created videoClip if deletion of the potentialClip fails
+        await prisma.videoClip.delete({
+          where: {
+            id: videoClip.id,
+          },
+        });
+
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+
+      return videoClip;
+    }),
   getAllPotentialClips: adminProcedure.query(async ({ ctx: { prisma } }) => {
     return await prisma.potentialClip.findMany({
       include: {

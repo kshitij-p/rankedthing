@@ -96,6 +96,7 @@ const ClipSubmitPage = ({
     api.videoClip.createPotentialClip.useMutation({
       onSettled: () => {
         void utils.stats.getClipsCountForGame.invalidate();
+        void utils.videoClip.getAllPotentialClips.invalidate();
       },
       onSuccess: (newClip) => {
         setNewClipId(newClip.id);
