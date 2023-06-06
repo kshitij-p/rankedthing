@@ -9,11 +9,14 @@ import "~/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import Layout from "~/components/ui/Layout";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { domAnimation, LazyMotion } from "framer-motion";
+import { LazyMotion } from "framer-motion";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
 });
+
+const loadFramerMotionFeatures = () =>
+  import("~/utils/framerMotionFeatures").then((res) => res.default);
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -29,7 +32,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
               font-family: ${montserrat.style.fontFamily};
             }
           `}</style>
-          <LazyMotion features={domAnimation} strict>
+          <LazyMotion features={loadFramerMotionFeatures} strict>
             <Layout>
               <Component {...pageProps} />
             </Layout>
